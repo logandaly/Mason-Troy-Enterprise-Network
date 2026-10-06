@@ -380,6 +380,171 @@ When troubleshooting software dependencies, reinstalling or correcting the suppo
 
 \---
 
+## Case 5 — Troy Client Unable to Reach the Internet
+
+### Problem
+
+TROY-WIN11-01 successfully received network configuration from the centralized Kea DHCP server and could communicate with internal Mason resources, but it could not reach the Internet.
+
+### Symptoms
+
+- TROY-WIN11-01 received a valid `10.20.20.0/24` DHCP lease.
+- The client successfully reached its default gateway at `10.20.20.1`.
+- The client successfully reached Mason infrastructure across the WAN.
+- A ping to `8.8.8.8` failed.
+- A traceroute stopped at the Troy default gateway.
+- TROY-SW1 reported that no gateway of last resort was configured.
+
+### Investigation
+
+Because DHCP, local gateway connectivity, and intersite routing were already functioning, troubleshooting focused on the route from Troy toward external networks.
+
+The routing table on TROY-SW1 showed OSPF routes for the Mason networks but no default route.
+
+MASON-R1 was then checked and already contained a static default route toward the FortiGate at `10.10.40.1`.
+
+This showed that Mason had an Internet path, but the default route was not being propagated to Troy through OSPF.
+
+### Root Cause
+
+MASON-R1 had a valid static default route toward the FortiGate, but OSPF process 1 was not advertising that default route to TROY-SW1.
+
+### Resolution
+
+The following command was added under OSPF process 1 on MASON-R1:
+
+`default-information originate`
+
+After OSPF convergence, TROY-SW1 learned:
+
+`O*E2 0.0.0.0/0 [110/1] via 10.255.0.1`
+
+### Validation
+
+After the routing change:
+
+- TROY-SW1 displayed `10.255.0.1` as its gateway of last resort.
+- TROY-WIN11-01 successfully pinged `8.8.8.8` with 0% packet loss.
+- Internal Mason-Troy connectivity continued to function normally.
+
+This validated the complete Troy-to-Internet routing path through MASON-R1 and FortiGate.
+
+### Lesson Learned
+
+Dynamic routing between internal networks does not automatically provide downstream routers or Layer 3 switches with an Internet default route. Default-route propagation must be explicitly designed and verified.
+
+---
+
+## Case 6 — Workstation Security Baseline Did Not Apply to Troy Client
+
+### Problem
+
+TROY-WIN11-01 successfully joined `masonmfg.internal`, and the Troy user policy applied correctly, but the Domain Workstation Security Baseline did not appear in the computer-scope Group Policy results.
+
+### Symptoms
+
+- `MASONMFG\test.employee` successfully authenticated to TROY-WIN11-01.
+- `gpupdate /force` completed successfully.
+- The Troy Workstation Policy appeared in the user's applied Group Policy Objects.
+- `gpresult /scope computer /r` showed only Default Domain Policy.
+- Domain Workstation Security Baseline was missing.
+
+### Investigation
+
+The computer-scope `gpresult` output was inspected to determine the Active Directory location of TROY-WIN11-01.
+
+The workstation appeared as:
+
+`CN=TROY-WIN11-01,CN=Computers,DC=masonmfg,DC=internal`
+
+The Domain Workstation Security Baseline was linked to the Troy Computers OU rather than the domain's default Computers container.
+
+Active Directory Users and Computers confirmed that the newly joined workstation had been automatically placed in the default Computers container.
+
+### Root Cause
+
+TROY-WIN11-01 was outside the organizational unit to which the Domain Workstation Security Baseline was linked.
+
+The GPO itself was functioning correctly, but the computer object was not within its scope.
+
+### Resolution
+
+TROY-WIN11-01 was moved in Active Directory to:
+
+`OU=Computers,OU=Troy,OU=MasonMFG,DC=masonmfg,DC=internal`
+
+Group Policy was then refreshed on the workstation.
+
+### Validation
+
+After the move and policy refresh:
+
+- `gpresult /scope computer /r` showed the correct Troy Computers OU.
+- Domain Workstation Security Baseline appeared under Applied Group Policy Objects.
+- `InactivityTimeoutSecs` returned `REG_DWORD 0x12c`, confirming the configured 300-second inactivity timeout.
+- The existing Troy user policy continued to function.
+
+### Lesson Learned
+
+Successful domain membership does not guarantee that an endpoint is located in the correct Active Directory OU. Because GPO scope depends on directory placement and linking, computer-object location should be verified when an expected policy does not apply.
+
+---
+
+## Case 7 — Troy Domain Join Initially Unable to Locate Domain Controller
+
+### Problem
+
+TROY-WIN11-01 initially reported that an Active Directory Domain Controller for `masonmfg.internal` could not be contacted during the domain-join process.
+
+### Symptoms
+
+- The Troy client had working routed connectivity.
+- Internet connectivity was operational.
+- The client was configured to use `10.10.30.10` as its DNS server.
+- An Active Directory SRV lookup timed out against `10.10.30.10`.
+- The initial domain-join attempt could not locate a domain controller.
+
+### Investigation
+
+DNS connectivity was tested separately from general network connectivity.
+
+From TROY-WIN11-01:
+
+`Test-NetConnection 10.10.30.10 -Port 53`
+
+returned:
+
+`TcpTestSucceeded : True`
+
+This proved that the Troy client could reach the Windows DNS server over TCP port 53 from its `10.20.20.0/24` network.
+
+No network or firewall configuration was changed solely on the basis of the initial DNS timeout. Domain-controller discovery was retested, and the domain join subsequently became available.
+
+During the join process, the normal Troy employee test account was also distinguished from the domain administrator account authorized to perform the join.
+
+### Root Cause
+
+A definitive root cause for the temporary DNS/SRV lookup timeout was not established.
+
+The available evidence confirmed IP connectivity and TCP port 53 reachability to the DNS server, so no unsupported root-cause claim was made.
+
+### Resolution
+
+Domain-controller discovery was retested after connectivity verification. TROY-WIN11-01 was then successfully joined to `masonmfg.internal` using authorized domain administrator credentials.
+
+### Validation
+
+After joining the domain:
+
+- `MASONMFG\test.employee` successfully authenticated to TROY-WIN11-01.
+- Group Policy processing completed successfully.
+- The workstation communicated with the domain controller and received domain policies.
+
+### Lesson Learned
+
+A temporary service-discovery failure should not immediately be attributed to routing or firewall configuration. Testing the specific service path first can prevent unnecessary network changes. Troubleshooting documentation should also distinguish a confirmed root cause from a problem that disappeared before its exact cause could be established.
+
+
 
 
 \## Troubleshooting Methodology
@@ -413,4 +578,3 @@ The project uses a structured troubleshooting process when connectivity or servi
 
 
 This approach helps distinguish Layer 1, Layer 2, Layer 3, host, and application problems without making unnecessary configuration changes.
-

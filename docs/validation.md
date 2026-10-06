@@ -530,55 +530,246 @@ Reverse DNS resolution is operational.
 
 \---
 
+## 11. Windows Security Auditing
+
+### Objective
+
+Verify that Windows Advanced Audit Policy settings are applied through Group Policy and generate Security log events during controlled Active Directory activity.
+
+### Validation
+
+Advanced Audit Policy settings were verified using `auditpol`.
+
+Controlled tests produced the following Windows Security events:
+
+- Event ID 4768 — Kerberos authentication ticket request
+- Event ID 4769 — Kerberos service ticket request
+- Event ID 4738 — User account modification
+- Event ID 4728 — Member added to a security-enabled global group
+- Event ID 4729 — Member removed from a security-enabled global group
+- Event ID 5136 — Active Directory object modification
+
+Directory Service Changes auditing was additionally validated using a SACL applied to descendant user objects.
+
+Computer Account Management auditing was policy-validated but was not intentionally triggered for event-level validation.
+
+### Result
+
+Advanced Audit Policy configuration and multiple security auditing categories were successfully validated through effective policy and Windows Security event evidence.
+
+**Status: PASS**
+
+---
+
+## 12. Kea DHCP and DHCP Relay
+
+### Objective
+
+Verify centralized DHCP address assignment from the Mason Ubuntu Server to a client on the remote Troy employee VLAN.
+
+### Configuration
+
+- Kea DHCP Server: `10.10.30.20`
+- Troy Employee Network: `10.20.20.0/24`
+- Troy Gateway: `10.20.20.1`
+- DHCP Relay: `ip helper-address 10.10.30.20`
+- DNS Server: `10.10.30.10`
+- DNS Suffix: `masonmfg.internal`
+
+### Validation
+
+TROY-WIN11-01 successfully received:
+
+- IPv4 address: `10.20.20.103/24`
+- Default gateway: `10.20.20.1`
+- DHCP server: `10.10.30.20`
+- DNS server: `10.10.30.10`
+- DNS suffix: `masonmfg.internal`
+
+The client successfully reached both its local gateway and Mason infrastructure across the routed WAN.
+
+### Result
+
+Centralized Kea DHCP and Cisco DHCP relay successfully provided network configuration to the remote Troy employee VLAN.
+
+**Status: PASS**
+
+---
+
+## 13. FortiGate and Internet Connectivity
+
+### Objective
+
+Verify that internal enterprise traffic can reach external networks through the FortiGate Internet edge.
+
+### Validation
+
+Internet connectivity was successfully demonstrated from both Mason infrastructure and the Troy Windows client.
+
+TROY-WIN11-01 successfully pinged:
+
+`8.8.8.8`
+
+with 0% packet loss after the required default route was propagated through OSPF.
+
+External DNS resolution was also successfully validated through the internal Windows DNS infrastructure.
+
+### Result
+
+The enterprise network successfully reaches external destinations through the Mason routing and FortiGate Internet path.
+
+**Status: PASS**
+
+---
+
+## 14. OSPF Default Route Propagation
+
+### Objective
+
+Verify that Troy dynamically receives an Internet default route from Mason through OSPF.
+
+### Configuration
+
+MASON-R1 contains a static default route toward the FortiGate and advertises the default route through OSPF using:
+
+`default-information originate`
+
+### Validation
+
+TROY-SW1 successfully learned:
+
+`O*E2 0.0.0.0/0 [110/1] via 10.255.0.1`
+
+The gateway of last resort on TROY-SW1 became `10.255.0.1`.
+
+After convergence, TROY-WIN11-01 successfully reached `8.8.8.8`.
+
+### Result
+
+OSPF default-route propagation from Mason to Troy is operational.
+
+**Status: PASS**
+
+---
+
+## 15. Troy Domain Join and Authentication
+
+### Objective
+
+Verify that a workstation located at the Troy site can join the Mason Active Directory domain and authenticate a domain user across the routed WAN.
+
+### Validation
+
+TROY-WIN11-01 successfully joined:
+
+`masonmfg.internal`
+
+After rebooting, the Troy employee test account successfully authenticated to the workstation.
+
+`gpresult` identified the domain controller and confirmed domain-based policy processing.
+
+### Result
+
+Active Directory domain membership and domain authentication across the Mason-Troy WAN were successfully validated.
+
+**Status: PASS**
+
+---
+
+## 16. Troy User Group Policy
+
+### Objective
+
+Verify that user-side Group Policy settings linked to the Troy Users OU apply to a Troy employee account.
+
+### Validation
+
+After signing in as the Troy employee test account:
+
+- `gpupdate /force` completed successfully.
+- `gpresult /r` listed Troy Workstation Policy under Applied Group Policy Objects.
+- Membership in the expected Troy and shared-resource security groups was confirmed.
+- Attempting to access the Windows Run command produced a policy restriction message.
+
+The configured Settings Page Visibility restriction for the Windows About page has not yet been successfully behaviorally validated and remains under investigation.
+
+### Result
+
+The Troy Workstation Policy is confirmed to apply to the Troy employee account, and the Run restriction has been behaviorally validated.
+
+**Status: PASS — with one configured setting still under investigation**
+
+---
+
+## 17. Domain Workstation Security Baseline
+
+### Objective
+
+Verify that the shared computer security baseline applies to TROY-WIN11-01 after correct Active Directory OU placement.
+
+### Validation
+
+After moving TROY-WIN11-01 into:
+
+`OU=Computers,OU=Troy,OU=MasonMFG,DC=masonmfg,DC=internal`
+
+computer-scope `gpresult` showed:
+
+- Domain Workstation Security Baseline
+- Default Domain Policy
+
+The configured machine inactivity limit was independently checked using the Windows registry.
+
+`InactivityTimeoutSecs` returned:
+
+`REG_DWORD 0x12c`
+
+which corresponds to 300 seconds.
+
+### Result
+
+The Domain Workstation Security Baseline successfully applies to the Troy workstation, and the configured five-minute inactivity timeout was validated.
+
+**Status: PASS**
+
+---
 
 
-\## Validation Still Required
 
+## Validation Still Required
 
+- Complete remaining Troy workstation GPO validation
 
-The following tests will be added as their corresponding project phases are implemented:
+- Validate Mason workstation domain join, authentication, and site-specific Group Policy
 
+- Expand centralized Kea DHCP to additional Mason and Troy VLANs
 
+- Validate domain file sharing across the Mason-Troy WAN
 
-\- Domain client join and authentication
+- Perform additional FortiGate firewall policy validation
 
-\- Active Directory user, group, and organizational unit validation
+- Integrate the legacy Windows XP/manufacturing endpoint
 
-\- DHCP address assignment
+- Implement Legacy/OT VLAN isolation using extended ACLs
 
-\- DHCP relay between VLANs
+- Validate Legacy/OT isolation with before-and-after connectivity testing
 
-\- DNS forwarding and external name resolution
+- Validate authorized management access
 
-\- FortiGate internal connectivity
+- Implement and validate additional switch security and hardening controls
 
-\- Internet connectivity through FortiGate
+- Implement centralized logging and monitoring
 
-\- Firewall policy validation
+- Develop and validate Python/Netmiko automation
 
-\- Mason-to-Troy endpoint communication
+- Validate automated configuration backup functionality
 
-\- Legacy Windows XP connectivity
+- Perform Wireshark protocol analysis
 
-\- Legacy/OT ACL isolation
+- Complete final end-to-end enterprise connectivity testing
 
-\- Legacy/OT Internet blocking
+- Complete final end-to-end security testing
 
-\- Authorized management access
-
-\- Switch security and hardening controls
-
-\- Centralized logging
-
-\- Python/Netmiko automation
-
-\- Configuration backup validation
-
-\- Wireshark protocol analysis
-
-\- End-to-end enterprise connectivity
-
-\- End-to-end security testing
 
 
 

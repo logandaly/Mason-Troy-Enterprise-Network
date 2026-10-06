@@ -48,7 +48,7 @@ Mason serves as the corporate headquarters and hosts the project's primary serve
 
 &#x20; - Advertises Mason networks into OSPF.
 
-&#x20; - Will provide the path toward the FortiGate security edge and Internet.
+&#x20; - Provides the upstream path toward the FortiGate security edge and Internet.
 
 
 
@@ -76,7 +76,7 @@ Mason serves as the corporate headquarters and hosts the project's primary serve
 
 &#x20; - Located in Mason VLAN 30.
 
-&#x20; - Provides Linux-based infrastructure services and will host DHCP and other supporting services.
+&#x20; - Provides centralized Kea DHCP and other Linux-based infrastructure services.
 
 
 
@@ -125,6 +125,12 @@ Troy represents the manufacturing facility and contains both standard business s
 &#x20; - Located in VLAN 20.
 
 &#x20; - Provide normal business connectivity at the manufacturing facility.
+
+&#x20; - TROY-WIN11-01 provides the current Windows 11 enterprise client used for DHCP, Active Directory, Group Policy, DNS, and routed connectivity validation.
+
+&#x20; - TROY-WIN11-01 receives centralized DHCP service from the Mason Ubuntu Server through DHCP relay on TROY-SW1.
+
+
 
 
 
@@ -179,6 +185,8 @@ Mason and Troy are connected using a routed point-to-point WAN network.
 
 
 OSPF process 1 and Area 0 are used to dynamically exchange routes between the two sites.
+
+MASON-R1 also advertises its default route into OSPF. TROY-SW1 learns `0.0.0.0/0` through MASON-R1 at `10.255.0.1`, providing Troy with a dynamically learned path toward the centralized FortiGate Internet edge.
 
 
 
@@ -263,36 +271,54 @@ This design allows virtual systems to participate directly in the same VLAN and 
 Windows Server 2025 currently connects through port 9, and Ubuntu Server connects through port 10. Both systems have successfully reached the Mason VLAN 30 gateway through the physical network.
 
 
+## Centralized DHCP Architecture
+
+Kea DHCP runs on the Mason Ubuntu Server at `10.10.30.20`.
+
+Troy uses DHCP relay to obtain centralized address configuration across the routed WAN. TROY-SW1 VLAN 20 is configured with:
+
+`ip helper-address 10.10.30.20`
+
+This allows DHCP traffic from the Troy employee network to reach the Kea server even though the server resides on the remote Mason server network.
+
+TROY-WIN11-01 successfully received an address from the `10.20.20.0/24` scope along with:
+
+- Default gateway `10.20.20.1`
+- DNS server `10.10.30.10`
+- DNS suffix `masonmfg.internal`
+
+This architecture centralizes DHCP services at Mason while supporting remote Troy networks through Layer 3 DHCP relay.
+
+---
 
 
 
-\## Security Edge and Internet Architecture
+## Security Edge and Internet Architecture
 
+The FortiGate virtual firewall serves as the centralized security boundary between the enterprise network and external networks.
 
+MASON-R1 connects the internal routed enterprise network to the FortiGate through the `10.10.40.0/30` transit network. MASON-R1 uses `10.10.40.1` as its next hop for the default route toward the FortiGate.
 
-The FortiGate virtual firewall is planned to serve as the security boundary between the enterprise network and the Internet.
+The FortiGate maintains routing toward the internal enterprise networks and provides firewall policy enforcement and NAT for Internet-bound traffic.
 
+### Internet Traffic Path
 
+Traffic from the Troy employee network follows the centralized path:
 
-The virtualization host uses Wi-Fi for upstream Internet connectivity. A separate physical Ethernet interface will bridge the Mason network to the FortiGate VM running inside GNS3.
+`TROY-WIN11-01 → TROY-SW1 → Mason-Troy WAN → MASON-R1 → FortiGate → External Network`
 
+MASON-R1 advertises its default route through OSPF using:
 
+`default-information originate`
 
-\### Planned Internet Traffic Path
+TROY-SW1 therefore dynamically learns:
 
+`O*E2 0.0.0.0/0 via 10.255.0.1`
 
+This provides the Troy site with an Internet path without requiring a separate static default route on TROY-SW1.
 
-`Mason/Troy Network → MASON-R1 → Physical Ethernet Bridge → GNS3 Cloud → FortiGate → GNS3 NAT → Host Wi-Fi → Internet`
+End-to-end Internet connectivity has been validated from TROY-WIN11-01 using a successful ping to `8.8.8.8`.
 
+The FortiGate remains the centralized policy enforcement point for traffic leaving the enterprise network.
 
-
-MASON-R1 will use the FortiGate as its upstream path for Internet-bound traffic. Once this connection is implemented, the default route can be propagated toward Troy so that normal business networks at both locations can reach the Internet through the centralized security edge.
-
-
-
-The FortiGate will provide firewall policy enforcement between the internal enterprise network and external networks.
-
-
-
-The legacy Windows XP manufacturing environment at Troy will not receive normal Internet access. Security controls will be designed around least-privilege access, allowing only traffic specifically required for manufacturing operations.
-
+The legacy Windows XP manufacturing environment at Troy will not receive normal unrestricted Internet access. Planned extended ACL and firewall controls will enforce least-privilege isolation for the Legacy/OT VLAN.

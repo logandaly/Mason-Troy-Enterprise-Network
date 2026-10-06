@@ -232,5 +232,143 @@ This provides the foundation for future domain-joined clients, centralized authe
 
 
 
+---
+
+## Milestone 6 — Active Directory Organization, Group Policy, and Security Auditing
+
+### Completed
+
+- Created the `MasonMFG` organizational structure in Active Directory.
+- Created separate Mason and Troy organizational units for users, computers, and servers.
+- Created test domain user accounts for Mason and Troy validation.
+- Created security groups for employee and shared-resource access.
+- Created and linked the Troy Workstation Policy.
+- Created and linked the Domain Workstation Security Baseline.
+- Configured Windows Advanced Audit Policy through Group Policy.
+- Enabled auditing for Kerberos authentication and service ticket activity.
+- Enabled auditing for user and security group account management.
+- Enabled Directory Service Changes auditing.
+- Configured an Active Directory SACL to audit changes to descendant user objects.
+- Validated security auditing through Windows Security event logs.
+
+### Validation
+
+Advanced Audit Policy settings were verified with `auditpol`. Controlled tests generated and validated Windows Security events including Kerberos authentication, Kerberos service ticket requests, user account changes, security group membership changes, and Active Directory object modifications.
+
+This established centralized security policy enforcement and auditing through Active Directory and Group Policy.
+
+---
+
+## Milestone 7 — FortiGate Internet Edge
+
+### Completed
+
+- Integrated a FortiGate virtual firewall with the Mason network.
+- Established the routed transit path between MASON-R1 and FortiGate.
+- Configured a default route from MASON-R1 toward the FortiGate.
+- Configured FortiGate routing toward the internal enterprise networks.
+- Configured an internal-to-Internet firewall policy with NAT.
+- Verified Internet connectivity from the Mason network.
+- Verified external DNS resolution through the Windows DNS infrastructure.
+
+### Validation
+
+MASON-R1 and the Mason Windows Server successfully reached external Internet destinations. Internal Active Directory DNS continued to resolve `masonmfg.internal`, while external DNS queries were successfully forwarded for public name resolution.
+
+---
+
+## Milestone 8 — Centralized Kea DHCP and Troy Endpoint Connectivity
+
+### Completed
+
+- Installed and configured Kea DHCP on Ubuntu Server at `10.10.30.20`.
+- Configured DHCP service for the Troy employee network.
+- Configured DHCP relay on TROY-SW1 VLAN 20 using `ip helper-address 10.10.30.20`.
+- Connected TROY-WIN11-01 to the Troy employee VLAN.
+- Successfully assigned a DHCP lease across the routed Mason-Troy network.
+- Supplied the Troy client with its default gateway, Active Directory DNS server, and domain suffix.
+- Verified connectivity from the Troy client to the Troy gateway and Mason server infrastructure.
+
+### Validation
+
+TROY-WIN11-01 received:
+
+- IPv4 address: `10.20.20.103/24`
+- Default gateway: `10.20.20.1`
+- DHCP server: `10.10.30.20`
+- DNS server: `10.10.30.10`
+- DNS suffix: `masonmfg.internal`
+
+This demonstrated centralized DHCP operation across the routed Mason-Troy WAN using DHCP relay.
+
+---
+
+## Milestone 9 — Troy Internet Routing and OSPF Default Route
+
+### Troubleshooting
+
+Although TROY-WIN11-01 could communicate with internal Mason resources, initial Internet testing failed. A traceroute stopped at the Troy default gateway, and TROY-SW1 reported that no gateway of last resort was configured.
+
+MASON-R1 already contained a static default route toward the FortiGate at `10.10.40.1`, but that default route was not being advertised to Troy.
+
+### Resolution
+
+OSPF process 1 on MASON-R1 was configured with:
+
+`default-information originate`
+
+TROY-SW1 subsequently learned:
+
+`O*E2 0.0.0.0/0 via 10.255.0.1`
+
+### Validation
+
+After OSPF convergence, TROY-WIN11-01 successfully pinged `8.8.8.8` with 0% packet loss.
+
+This validated the complete path from the Troy employee network through TROY-SW1, the Mason-Troy WAN, MASON-R1, FortiGate, and the external network.
+
+---
+
+## Milestone 10 — Troy Domain Join and Group Policy Validation
+
+### Completed
+
+- Joined TROY-WIN11-01 to `masonmfg.internal`.
+- Successfully authenticated to the workstation using the Troy domain test account.
+- Forced Group Policy processing with `gpupdate /force`.
+- Verified the Troy Workstation Policy using `gpresult`.
+- Identified that the workstation computer object had initially been created in the default Active Directory `Computers` container.
+- Moved TROY-WIN11-01 into `MasonMFG → Troy → Computers`.
+- Refreshed Group Policy after correcting the computer object's OU placement.
+- Verified application of the Domain Workstation Security Baseline.
+- Validated the configured 300-second machine inactivity timeout.
+- Behaviorally validated the Troy policy that restricts access to the Run command.
+
+### Troubleshooting
+
+The Domain Workstation Security Baseline initially did not appear in the computer-scope Resultant Set of Policy.
+
+`gpresult /scope computer /r` showed that TROY-WIN11-01 was located in the default:
+
+`CN=Computers,DC=masonmfg,DC=internal`
+
+Because the security baseline was linked to the Troy Computers OU, the workstation was outside the GPO's intended scope.
+
+The computer object was moved to:
+
+`OU=Computers,OU=Troy,OU=MasonMFG,DC=masonmfg,DC=internal`
+
+After Group Policy was refreshed, the Domain Workstation Security Baseline successfully appeared under the applied computer policies.
+
+### Validation
+
+The following endpoint controls were validated:
+
+- Troy Workstation Policy applied to the Troy employee user.
+- Domain Workstation Security Baseline applied to TROY-WIN11-01.
+- `InactivityTimeoutSecs` returned `0x12c`, confirming the configured 300-second inactivity limit.
+- Access to the Windows Run command was blocked by policy.
+
+The configured Settings Page Visibility restriction for the Windows About page is still under investigation and is not considered validated.
 
 

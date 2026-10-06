@@ -111,62 +111,49 @@ The environment combines physical Cisco networking equipment with virtualized in
 \### Completed
 
 
+### Completed
 
-\- Physical Mason and Troy Cisco network infrastructure
+- Physical Mason and Troy Cisco network infrastructure
+- VLAN creation and initial network segmentation
+- Mason router-on-a-stick inter-VLAN routing
+- Troy Layer 3 switching and inter-VLAN routing
+- Routed WAN connection between Mason and Troy
+- OSPF adjacency and bidirectional route propagation between sites
+- OSPF default-route advertisement from Mason to Troy
+- GNS3 integration with the physical network
+- Windows Server 2025 deployment
+- Ubuntu Server deployment
+- Active Directory Domain Services deployment
+- `masonmfg.internal` Active Directory forest and domain
+- Active Directory organizational unit and security group structure
+- AD-integrated DNS with forward and reverse lookup validation
+- Windows security auditing through Group Policy and Advanced Audit Policy
+- Kea DHCP service on Ubuntu Server
+- DHCP relay from Troy to the centralized Kea server
+- Successful DHCP assignment to the Troy Windows 11 client
+- FortiGate integration, NAT, and Internet connectivity
+- End-to-end Internet connectivity from the Troy site
+- Windows 11 Troy workstation joined to `masonmfg.internal`
+- Domain authentication using a Troy employee account
+- Troy user Group Policy application and behavioral validation
+- Domain workstation security baseline application and validation
+- Bidirectional communication between Mason and Troy infrastructure
 
-\- VLAN creation and initial network segmentation
+### In Progress / Planned
 
-\- Mason router-on-a-stick inter-VLAN routing
-
-\- Troy Layer 3 switching and inter-VLAN routing
-
-\- Routed WAN connection between Mason and Troy
-
-\- OSPF adjacency and bidirectional route propagation between sites
-
-\- GNS3 integration with the physical Mason network
-
-\- Windows Server 2025 deployment
-
-\- Ubuntu Server deployment
-
-\- Active Directory Domain Services deployment
-
-\- `masonmfg.internal` Active Directory forest and domain
-
-\- AD-integrated DNS configuration
-
-\- Forward and reverse DNS configuration and validation
-
-\- Bidirectional communication between Windows and Ubuntu servers
-
-
-
-\### In Progress / Planned
-
-
-
-\- Active Directory organizational structure and domain clients
-
-\- DHCP services using Ubuntu Server
-
-\- DHCP relay across network segments
-
-\- FortiGate integration and Internet connectivity
-
-\- Legacy Windows XP / manufacturing network isolation
-
-\- ACL and firewall security policies
-
-\- Network device hardening
-
-\- Centralized logging and monitoring
-
-\- Python/Netmiko network automation
-
-\- Wireshark validation and troubleshooting
-
-\- End-to-end security and connectivity testing
+- Expand centralized Kea DHCP scopes to additional Mason and Troy VLANs
+- Complete remaining workstation Group Policy validation
+- Validate domain-based file sharing across the Mason-Troy WAN
+- Legacy Windows XP / manufacturing network integration
+- Legacy/OT VLAN isolation using extended ACLs
+- ACL before-and-after connectivity validation
+- Additional firewall security policy validation
+- Network device hardening
+- Centralized logging and monitoring
+- Python/Netmiko network automation
+- Wireshark validation and troubleshooting
+- Final end-to-end security testing
+- Architecture diagrams and final project documentation
 
 
 
