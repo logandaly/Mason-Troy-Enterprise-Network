@@ -691,13 +691,20 @@ After signing in as the Troy employee test account:
 - Membership in the expected Troy and shared-resource security groups was confirmed.
 - Attempting to access the Windows Run command produced a policy restriction message.
 
-The configured Settings Page Visibility restriction for the Windows About page has not yet been successfully behaviorally validated and remains under investigation.
+The Troy Workstation Policy was also validated for its computer-side Settings Page Visibility restriction.
+
+After identifying and enabling the previously disabled GPO link on the Troy Computers OU, network connectivity was restored and Group Policy processing was completed.
+
+While signed in as `MASONMFG\test.employee`, the Windows Settings application no longer displayed the **System → About** page.
+
+This confirmed successful behavioral enforcement of the configured `hide:about` restriction on `TROY-WIN11-01`.
+
+**Status: PASS — Troy Run restriction and About-page visibility restriction validated.**
 
 ### Result
 
 The Troy Workstation Policy is confirmed to apply to the Troy employee account, and the Run restriction has been behaviorally validated.
 
-**Status: PASS — with one configured setting still under investigation**
 
 ---
 
@@ -732,19 +739,81 @@ The Domain Workstation Security Baseline successfully applies to the Troy workst
 
 **Status: PASS**
 
+
+---
+
+## 18. Six-VLAN Kea DHCP Validation
+
+### Objective
+
+Verify that the centralized Kea DHCPv4 server at `10.10.30.20` successfully distributes appropriate IPv4 network configurations to clients across all six Mason and Troy VLANs.
+
+### Validation Results
+
+DHCP testing was performed using GNS3 VPC clients connected to the appropriate VLANs.
+
+| Site | VLAN | Network | Validated DHCP Address | Result |
+|---|---|---|---|---|
+| Mason | 10 — Management | 10.10.10.0/24 | 10.10.10.102 | PASS |
+| Mason | 20 — Employees | 10.10.20.0/24 | 10.10.20.102 | PASS |
+| Mason | 30 — Servers | 10.10.30.0/24 | 10.10.30.100 | PASS |
+| Troy | 10 — Management | 10.20.10.0/24 | 10.20.10.101 | PASS |
+| Troy | 20 — Employees | 10.20.20.0/24 | See endpoint evidence | PASS |
+| Troy | 30 — Legacy/OT | 10.20.30.0/24 | 10.20.30.103 | PASS |
+
+All six VLANs successfully received DHCP configuration from the centralized Kea service during their respective validation tests.
+
+The Troy VLAN 20 Windows 11 workstation separately received `10.20.20.103/24`.
+
+### Mason DHCP Evidence
+
+**Mason VLAN 10 — Management**
+
+![Mason VLAN 10 DHCP Validation](../screenshots/servers/dhcp/validation/Mason%20VLAN%2010.jpg)
+
+**Mason VLAN 20 — Employees**
+
+![Mason VLAN 20 DHCP Validation](../screenshots/servers/dhcp/validation/Mason%20VLAN%2020.jpg)
+
+**Mason VLAN 30 — Servers**
+
+![Mason VLAN 30 DHCP Validation](../screenshots/servers/dhcp/validation/Mason%20VLAN%2030.jpg)
+
+### Troy DHCP Evidence
+
+**Troy VLAN 10 — Management**
+
+![Troy VLAN 10 DHCP Validation](../screenshots/servers/dhcp/validation/Troy%20VLAN%2010.jpg)
+
+**Troy VLAN 10 — DHCP Configuration Details**
+
+![Troy VLAN 10 Show IP](../screenshots/servers/dhcp/validation/Troy%20VLAN%2010%20show%20ip.jpg)
+
+**Troy VLAN 20 — Employees**
+
+![Troy VLAN 20 DHCP Validation](../screenshots/servers/dhcp/validation/Troy%20VLAN%2020.jpg)
+
+**Troy VLAN 30 — Legacy/OT**
+
+![Troy VLAN 30 DHCP Validation](../screenshots/servers/dhcp/validation/Troy%20VLAN%2030.jpg)
+
+### Result
+
+**Status: PASS — All Six VLANs**
+
+Centralized DHCP address assignment was validated across the Mason and Troy VLANs.
+
+These tests demonstrate successful client addressing within their respective VLANs. Additional connectivity tests shown in the evidence provide support for inter-VLAN routing, server reachability, and cross-site communication.
+
+The configured DHCP scope definitions, pools, gateway options, and DNS options are documented separately in [IP Addressing and VLAN Plan](ip-vlan-plan.md).
+
 ---
 
 
 
 ## Validation Still Required
 
-- Complete remaining Troy workstation GPO validation
-
-- Validate Mason workstation domain join, authentication, and site-specific Group Policy
-
-- Expand centralized Kea DHCP to additional Mason and Troy VLANs
-
-- Validate domain file sharing across the Mason-Troy WAN
+- Complete CompanyShare validation from the Troy Windows 11 workstation, including investigating the remaining File Explorer access restriction. PowerShell-based SMB authentication and file read/create/delete operations were previously validated successfully.
 
 - Perform additional FortiGate firewall policy validation
 

@@ -1,4 +1,4 @@
-\# Project Milestones
+# Project Milestones
 
 
 
@@ -6,31 +6,31 @@ This document tracks the implementation progress of the Mason-Troy Enterprise Ne
 
 
 
-\## Milestone 1 — Physical Network and VLAN Foundation
+## Milestone 1 — Physical Network and VLAN Foundation
 
 
 
-\### Completed
+### Completed
 
 
 
-\- Assigned physical Cisco equipment to the Mason and Troy sites.
+- Assigned physical Cisco equipment to the Mason and Troy sites.
 
-\- Established Mason and Troy VLAN structures.
+- Established Mason and Troy VLAN structures.
 
-\- Configured management, employee, server, and legacy/OT network segments.
+- Configured management, employee, server, and legacy/OT network segments.
 
-\- Configured VLAN 999 as a dedicated native VLAN.
+- Configured VLAN 999 as a dedicated native VLAN.
 
-\- Configured Mason router-on-a-stick inter-VLAN routing.
+- Configured Mason router-on-a-stick inter-VLAN routing.
 
-\- Configured Troy Layer 3 switching using SVIs.
+- Configured Troy Layer 3 switching using SVIs.
 
-\- Validated local VLAN gateway connectivity.
+- Validated local VLAN gateway connectivity.
 
 
 
-\### Design Decision
+### Design Decision
 
 
 
@@ -42,39 +42,39 @@ This avoided an unnecessary IOS upgrade while making effective use of the availa
 
 
 
-\---
+---
 
 
 
-\## Milestone 2 — Mason-Troy WAN and OSPF
+## Milestone 2 — Mason-Troy WAN and OSPF
 
 
 
-\### Completed
+### Completed
 
 
 
-\- Converted TROY-SW1 Fa0/24 into a routed port.
+- Converted TROY-SW1 Fa0/24 into a routed port.
 
-\- Configured the `10.255.0.0/30` point-to-point WAN.
+- Configured the `10.255.0.0/30` point-to-point WAN.
 
-\- Assigned `10.255.0.1` to MASON-R1.
+- Assigned `10.255.0.1` to MASON-R1.
 
-\- Assigned `10.255.0.2` to TROY-SW1.
+- Assigned `10.255.0.2` to TROY-SW1.
 
-\- Configured OSPF process 1 and Area 0.
+- Configured OSPF process 1 and Area 0.
 
-\- Established a full OSPF adjacency between Mason and Troy.
+- Established a full OSPF adjacency between Mason and Troy.
 
-\- Advertised the Mason and Troy VLAN networks through OSPF.
+- Advertised the Mason and Troy VLAN networks through OSPF.
 
-\- Verified bidirectional dynamic route propagation.
+- Verified bidirectional dynamic route propagation.
 
-\- Saved validated Cisco configurations.
+- Saved validated Cisco configurations.
 
 
 
-\### Validation
+### Validation
 
 
 
@@ -82,39 +82,39 @@ MASON-R1 successfully learned the Troy networks through `10.255.0.2`, while TROY
 
 
 
-\---
+---
 
 
 
-\## Milestone 3 — Physical and Virtual Network Integration
+## Milestone 3 — Physical and Virtual Network Integration
 
 
 
-\### Completed
+### Completed
 
 
 
-\- Integrated the GNS3 virtual environment with the physical Mason network.
+- Integrated the GNS3 virtual environment with the physical Mason network.
 
-\- Configured a GNS3 Ethernet switch with VLAN-aware access ports.
+- Configured a GNS3 Ethernet switch with VLAN-aware access ports.
 
-\- Configured GNS3 switch port 12 as an 802.1Q trunk.
+- Configured GNS3 switch port 12 as an 802.1Q trunk.
 
-\- Connected the trunk through a GNS3 Cloud interface to the host USB-to-Ethernet adapter.
+- Connected the trunk through a GNS3 Cloud interface to the host USB-to-Ethernet adapter.
 
-\- Converted MASON-SW1 Fa0/5 into an 802.1Q trunk.
+- Converted MASON-SW1 Fa0/5 into an 802.1Q trunk.
 
-\- Allowed VLANs 10, 20, 30, and 999 across the physical/virtual trunk.
+- Allowed VLANs 10, 20, 30, and 999 across the physical/virtual trunk.
 
-\- Verified trunk operation and Spanning Tree forwarding state.
+- Verified trunk operation and Spanning Tree forwarding state.
 
-\- Connected Windows Server and Ubuntu Server to Mason VLAN 30.
+- Connected Windows Server and Ubuntu Server to Mason VLAN 30.
 
-\- Verified virtual server connectivity through the physical Cisco infrastructure.
+- Verified virtual server connectivity through the physical Cisco infrastructure.
 
 
 
-\### Troubleshooting
+### Troubleshooting
 
 
 
@@ -130,39 +130,39 @@ This validated the complete path between the GNS3 virtual environment and the ph
 
 
 
-\---
+---
 
 
 
-\## Milestone 4 — Server Infrastructure
+## Milestone 4 — Server Infrastructure
 
 
 
-\### Completed
+### Completed
 
 
 
-\- Deployed Windows Server 2025 in the GNS3 environment.
+- Deployed Windows Server 2025 in the GNS3 environment.
 
-\- Configured Windows Server with static address `10.10.30.10/24`.
+- Configured Windows Server with static address `10.10.30.10/24`.
 
-\- Configured default gateway `10.10.30.1`.
+- Configured default gateway `10.10.30.1`.
 
-\- Deployed Ubuntu Server in the GNS3 environment.
+- Deployed Ubuntu Server in the GNS3 environment.
 
-\- Configured Ubuntu Server with static address `10.10.30.20/24`.
+- Configured Ubuntu Server with static address `10.10.30.20/24`.
 
-\- Configured default gateway `10.10.30.1`.
+- Configured default gateway `10.10.30.1`.
 
-\- Connected both servers to Mason VLAN 30.
+- Connected both servers to Mason VLAN 30.
 
-\- Verified both servers could reach the Mason VLAN 30 gateway.
+- Verified both servers could reach the Mason VLAN 30 gateway.
 
-\- Verified bidirectional communication between Windows Server and Ubuntu Server.
+- Verified bidirectional communication between Windows Server and Ubuntu Server.
 
 
 
-\### Troubleshooting
+### Troubleshooting
 
 
 
@@ -182,45 +182,45 @@ After the change, Ubuntu Server successfully reached Windows Server, confirming 
 
 
 
-\---
+---
 
 
 
-\## Milestone 5 — Active Directory and DNS
+## Milestone 5 — Active Directory and DNS
 
 
 
-\### Completed
+### Completed
 
 
 
-\- Installed Active Directory Domain Services (AD DS) on Windows Server 2025.
+- Installed Active Directory Domain Services (AD DS) on Windows Server 2025.
 
-\- Installed the Windows DNS Server role.
+- Installed the Windows DNS Server role.
 
-\- Promoted the server as the first domain controller in a new Active Directory forest.
+- Promoted the server as the first domain controller in a new Active Directory forest.
 
-\- Created the `masonmfg.internal` domain.
+- Created the `masonmfg.internal` domain.
 
-\- Configured the `MASONMFG` NetBIOS domain name.
+- Configured the `MASONMFG` NetBIOS domain name.
 
-\- Enabled DNS Server and Global Catalog functionality on the domain controller.
+- Enabled DNS Server and Global Catalog functionality on the domain controller.
 
-\- Verified the Active Directory-integrated DNS zones.
+- Verified the Active Directory-integrated DNS zones.
 
-\- Verified automatically generated Kerberos, LDAP, kpasswd, and Global Catalog SRV records.
+- Verified automatically generated Kerberos, LDAP, kpasswd, and Global Catalog SRV records.
 
-\- Created an IPv4 reverse lookup zone for the Mason server network.
+- Created an IPv4 reverse lookup zone for the Mason server network.
 
-\- Configured the reverse lookup zone to use secure dynamic updates.
+- Configured the reverse lookup zone to use secure dynamic updates.
 
-\- Created and validated a PTR record for the domain controller at `10.10.30.10`.
+- Created and validated a PTR record for the domain controller at `10.10.30.10`.
 
-\- Successfully validated reverse DNS resolution using `nslookup`.
+- Successfully validated reverse DNS resolution using `nslookup`.
 
 
 
-\### Validation
+### Validation
 
 
 
@@ -369,6 +369,106 @@ The following endpoint controls were validated:
 - `InactivityTimeoutSecs` returned `0x12c`, confirming the configured 300-second inactivity limit.
 - Access to the Windows Run command was blocked by policy.
 
-The configured Settings Page Visibility restriction for the Windows About page is still under investigation and is not considered validated.
+The Troy Workstation Policy's Settings Page Visibility restriction was successfully validated on October 16, 2026.
 
+After enabling the previously disabled Troy Computers OU policy link and restoring domain controller connectivity, Group Policy processing completed successfully.
+
+While signed in as `MASONMFG\test.employee` on `TROY-WIN11-01`, Windows Settings → System no longer displayed the About page, confirming enforcement of `hide:about`.
+
+Both the Troy Run command restriction and the About-page visibility restriction have now been behaviorally validated.
+
+
+---
+
+## Milestone 11 — Centralized Kea DHCP Expansion
+
+### Completed
+
+- Expanded the centralized Kea DHCPv4 configuration on Ubuntu Server (`10.10.30.20`) to support six VLAN subnets across the Mason and Troy sites.
+- Configured DHCP address pools from `.100` through `.150` for all six subnets.
+- Configured the appropriate VLAN default gateway for each DHCP scope.
+- Configured all six scopes to distribute the Active Directory DNS server at `10.10.30.10`.
+- Verified DHCP subnet definitions, pools, gateway options, and DNS options directly from the Kea configuration.
+- Demonstrated successful DHCP assignment to the Mason Windows 11 workstation.
+- Demonstrated DHCP assignment to a GNS3 test client on Mason VLAN 30.
+- Previously validated DHCP relay and lease assignment to the Troy Windows 11 workstation across the routed WAN.
+
+### Validation
+
+The following DHCP client tests have been completed:
+
+- **Troy VLAN 20:** `TROY-WIN11-01` received `10.20.20.103/24` from the centralized Kea server.
+- **Mason VLAN 20:** `MASON-WIN11-01` successfully received a valid DHCP lease after restoration of the GNS3 server connection.
+- **Mason VLAN 30:** A GNS3 test client received `10.10.30.100/24` and successfully pinged both the Ubuntu DHCP server and Windows domain controller.
+
+All six DHCP scopes were successfully validated through client-side DHCP testing across the Mason and Troy VLANs. GNS3 VPC testing confirmed successful address assignment, and additional Windows 11 endpoint testing provided supporting evidence. Photographic evidence of the six-VLAN validation is documented in docs/validation.md.
+
+
+### Troubleshooting
+
+During Mason workstation integration, DHCP requests initially failed because of a stale GNS3 connection between the Ubuntu server and the virtual network.
+
+Packet capture showed DHCP Discover traffic leaving the workstation without a corresponding DHCP Offer.
+
+The router's VLAN 20 subinterface and DHCP relay configuration were checked and found correct.
+
+Disconnecting and reconnecting the affected GNS3 link restored connectivity to Kea, allowing the workstation to obtain a valid DHCP lease.
+
+This demonstrated the importance of validating Layer 2 connectivity and DHCP relay paths before assuming a DHCP service configuration failure.
+
+### Supporting Evidence
+
+Detailed scope information and screenshots are available in [IP Addressing and VLAN Plan](ip-vlan-plan.md).
+
+---
+
+## Milestone 12 — Mason Windows 11 Workstation Integration
+
+### Completed
+
+- Created a separate Windows 11 Pro virtual workstation for the Mason corporate site.
+- Created an independent Mason QCOW2 base disk from the verified Troy workstation backup.
+- Configured a dedicated Mason GNS3 QEMU template with UEFI and SATA disk support.
+- Used Windows Sysprep to generalize the cloned installation and avoid duplicate workstation identity issues.
+- Completed Windows 11 setup and configured the workstation as `MASON-WIN11-01`.
+- Connected the workstation to Mason VLAN 20.
+- Successfully obtained network configuration through centralized Kea DHCP.
+- Joined the workstation to the `masonmfg.internal` Active Directory domain.
+- Moved its computer object into the Mason Computers organizational unit.
+- Successfully authenticated using the Mason domain account `MASONMFG\test.manager`.
+- Confirmed application of the Domain Workstation Security Baseline.
+
+### Troubleshooting
+
+The initial Mason workstation failed to boot correctly and entered the UEFI shell.
+
+Investigation identified problems with the QEMU template's disk image reference and disk interface configuration. The copied template initially referenced the Troy base image and launched the disk using IDE instead of the SATA/AHCI configuration required by the working installation.
+
+A separate Mason base image was created and validated using `qemu-img check` and `qemu-img info`. The Mason template was corrected to reference this independent disk.
+
+After correcting the QEMU configuration, the workstation successfully booted.
+
+The cloned Windows installation initially retained Troy's domain identity. To prevent conflicts, the original Troy workstation remained powered off while the Mason installation was generalized using Sysprep.
+
+During Mason VLAN 20 integration, DHCP initially failed because of a stale GNS3 connection to the Ubuntu DHCP server. Restoring the affected virtual link allowed the workstation to obtain its lease and proceed with domain integration.
+
+### Validation
+
+The following results were confirmed:
+
+- `MASON-WIN11-01` successfully joined `masonmfg.internal`.
+- Domain authentication succeeded using `MASONMFG\test.manager`.
+- The computer object was placed in `OU=Computers,OU=Mason,OU=MasonMFG,DC=masonmfg,DC=internal`.
+- Computer-scope `gpresult /r` confirmed application of the Domain Workstation Security Baseline and Default Domain Policy.
+- User-scope `gpresult /r` confirmed domain authentication context and membership in the Mason-Employees and Shared-Resources-Group security groups.
+
+Mason-specific user Group Policy configuration and behavioral validation remain pending. No unverified Mason-specific policy enforcement is claimed.
+
+### Significance
+
+This milestone established an independently configured Windows 11 workstation at the Mason site, complementing the previously deployed Troy workstation.
+
+Both sites now have domain-joined endpoints capable of using centralized Active Directory authentication and computer security policies.
+
+The troubleshooting process also demonstrated practical experience with QEMU disk images, virtualization templates, Windows Sysprep, DHCP relay, and Active Directory computer management.
 
