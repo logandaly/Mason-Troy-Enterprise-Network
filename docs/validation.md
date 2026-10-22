@@ -95,6 +95,22 @@ A full OSPF adjacency was successfully established between MASON-R1 and TROY-SW1
 \## 3. OSPF Route Propagation
 
 
+### OSPF Adjacency Evidence
+
+MASON-R1 successfully established an OSPF FULL adjacency with TROY-SW1.
+
+The `show ip ospf neighbor` output confirmed:
+
+- Neighbor ID: `10.255.0.2`
+- Neighbor address: `10.255.0.2`
+- Neighbor state: `FULL/DR`
+- Local interface: `GigabitEthernet0/1`
+
+This validates OSPF neighbor establishment across the Mason–Troy routed WAN.
+
+![Mason-Troy OSPF FULL Adjacency](../screenshots/routing/router%20ip%20ospf%20neighbor.png)
+
+
 
 \### Objective
 
@@ -807,13 +823,367 @@ These tests demonstrate successful client addressing within their respective VLA
 
 The configured DHCP scope definitions, pools, gateway options, and DNS options are documented separately in [IP Addressing and VLAN Plan](ip-vlan-plan.md).
 
+
+---
+
+## 19. Mason Windows 11 Domain Join and Group Policy Validation
+
+### Objective
+
+Verify that the Mason Windows 11 workstation successfully joins the centralized Active Directory domain, authenticates a domain user, resides in the correct organizational unit, and receives the shared workstation security baseline.
+
+### Domain Join Validation
+
+`MASON-WIN11-01` successfully joined the `masonmfg.internal` Active Directory domain.
+
+Windows displayed the confirmation message:
+
+"Welcome to the masonmfg.internal domain."
+
+**Status: PASS**
+
+![Mason Windows 11 Successful Domain Join](../screenshots/active-directory/Mason%20Client%20Domain%20Join.png)
+
+### Domain Authentication and User Validation
+
+The domain account `MASONMFG\test.manager` successfully authenticated on `MASON-WIN11-01`.
+
+User-scope `gpresult /r` confirmed:
+
+- The authenticated domain account and Mason Users OU placement.
+- Group Policy processing through the Mason domain controller.
+- Membership in `Mason-Employees`.
+- Membership in `Shared-Resources-Group`.
+
+No user-specific GPOs appeared in the applied policy results during this validation. Mason-specific user policy inspection and behavioral validation remain pending.
+
+**Status: PASS — Domain authentication and security group membership**
+
+![Mason Domain User Authentication](../screenshots/active-directory/Mason%20Client%20Domain%20Join-1.png)
+
+![Mason Domain Security Group Membership](../screenshots/active-directory/Mason%20Client%20Domain%20Join-2.png)
+
+### Computer Organizational Unit and Security Baseline
+
+Computer-scope `gpresult /scope computer /r` confirmed that `MASON-WIN11-01` was located in:
+
+`OU=Computers,OU=Mason,OU=MasonMFG,DC=masonmfg,DC=internal`
+
+The following Group Policy Objects were successfully applied:
+
+- Domain Workstation Security Baseline
+- Default Domain Policy
+
+This validates correct computer OU placement and application of the shared computer security baseline.
+
+**Status: PASS — Computer OU placement and baseline GPO application**
+
+![Mason Computer OU and Applied Policies](../screenshots/security/Mason%20Client%20Domain%20Join-3.png)
+
+![Mason Computer Group Policy Evidence](../screenshots/security/Mason%20Client%20Domain%20Join-4.png)
+
+### Result
+
+**Status: PASS — Domain Join, Authentication, and Shared Computer Security Baseline**
+
+The Mason workstation was successfully integrated into the centralized Active Directory environment.
+
+Domain authentication, security group membership, computer OU placement, and shared computer security policy application were validated.
+
+Mason-specific user Group Policy configuration and behavioral enforcement remain pending.
+
+
+
+## 20. Cross-Site SMB File Sharing
+
+### Objective
+
+Verify that a domain-authenticated Troy employee can access and modify a shared resource hosted on the Mason Windows Server across the routed enterprise network.
+
+### Validation
+
+The Troy Windows 11 workstation, using the `MASONMFG\test.employee` account, successfully mapped `\\WIN-F40P5E8HDVL\CompanyShare` as drive `Z:`.
+
+The employee modified and saved the `Company Information` text file through the mapped network drive.
+
+The updated file was subsequently opened on the Mason Windows Server, confirming that the changes were successfully written across the network.
+
+### Evidence
+
+![Troy Mapped Network Drive](../screenshots/servers/troy-win11-companyshare-mapped-drive-success.png)
+
+![Troy Shared File Modification](../screenshots/servers/troy-win11-companyshare-file-edit-success.png)
+
+![Mason Server File Verification](../screenshots/servers/mason-server-companyshare-file-write-verified.png)
+
+### Result
+
+Cross-site SMB access and file modification were successfully validated using domain authentication.
+
+**Status: PASS**
+
+
+
+## 21. SMB Share and NTFS Permission Validation
+
+### Objective
+
+Verify that the CompanyShare resource uses Active Directory security group membership and Windows permissions to control access.
+
+### Configuration
+
+- Server: Windows Server 2025
+- Shared folder: `C:\CompanyShare`
+- Share name: `CompanyShare`
+- Security group: `MASONMFG\Shared-Resources-Group`
+
+Active Directory group membership was verified for:
+
+- `test.manager` — Mason site
+- `test.employee` — Troy site
+
+### NTFS Permission Validation
+
+The Shared-Resources-Group was confirmed to have:
+
+- Modify
+- Read & execute
+- List folder contents
+- Read
+- Write
+
+![CompanyShare NTFS Permissions](../screenshots/servers/mason-companyshare-ntfs-permissions.png)
+
+### SMB Share Permission Validation
+
+The Shared-Resources-Group was confirmed to have:
+
+- Change — Allow
+- Read — Allow
+
+Full Control was not granted at the share level.
+
+![CompanyShare SMB Share Permissions](../screenshots/servers/mason-companyshare-smb-share-permissions.png)
+
+### Active Directory Group Membership
+
+Both Mason and Troy test accounts were confirmed as members of the Shared-Resources-Group.
+
+![Shared Resources Group Membership](../screenshots/active-directory/mason-ad-shared-resources-group-membership.png)
+
+### Result
+
+Group-based NTFS and SMB share permissions were verified.
+
+Together with Section 20, the evidence demonstrates that an authorized Troy user successfully accessed and modified a file on the Mason Windows Server.
+
+**Status: PASS**
+
+
+
+
+## 22. Troy Network Authentication Auditing
+
+### Objective
+
+Verify that the Mason domain controller records successful network authentication from a domain user at the Troy site.
+
+### Validation
+
+Windows Server 2025 Security Event Viewer recorded:
+
+- Event ID: 4624 — Successful Logon
+- Account: `MASONMFG\test.employee`
+- Logon Type: 3 — Network
+- Source Network Address: `10.20.20.100`
+- Source Workstation: Troy Windows 11 client
+- Result: Audit Success
+
+The event confirms that the Troy domain account successfully authenticated over the network.
+
+This evidence is consistent with the successful SMB file-sharing validation documented in Section 20. However, Event 4624 alone does not identify the specific shared file accessed.
+
+### Evidence
+
+![Troy Domain User Successful Logon](../screenshots/security/tro-ad-4624-testemployee-logon.png)
+
+![Troy Network Logon Type 3](../screenshots/security/troy-smb-4624-logontyp3.png)
+
+![Troy Authentication Source IP](../screenshots/security/troy-smb-4624-sourceip.png)
+
+### Result
+
+The domain controller successfully recorded a network logon for the Troy employee account originating from the Troy Windows 11 workstation.
+
+**Status: PASS**
+
+
+
+## 23. Windows Security Audit Policy and Kerberos Validation
+
+### Objective
+
+Verify that the Mason domain controller has successful and failed logon auditing enabled and records Kerberos authentication activity.
+
+### Group Policy Configuration
+
+The Windows Security Auditing Policy GPO was verified as linked to the Domain Controllers OU.
+
+- Link Enabled: Yes
+- GPO Status: Enabled
+- Enforced: No
+
+![Domain Controller Auditing GPO](../screenshots/security/mason-dc-security-auditing-gpo-link.png)
+
+### Effective Audit Policy
+
+The following command was executed on Windows Server 2025:
+
+`auditpol /get /subcategory:"Logon"`
+
+The effective policy returned:
+
+`Logon    Success and Failure`
+
+This confirms that both successful and failed logon auditing are enabled.
+
+![Windows Logon Auditing Policy](../screenshots/security/mason-ad-logon-auditing-policy.png)
+
+### Kerberos Authentication Auditing
+
+Windows Security Event Viewer recorded:
+
+- Event ID: 4769
+- Event Category: Kerberos Service Ticket Operations
+- Result: Audit Success
+
+The event confirmed that a Kerberos service ticket request was recorded by the domain controller.
+
+![Kerberos Event 4769](../screenshots/security/mason-ad-kerberos-event-4769.png)
+
+### Validation Limitations
+
+Event ID 4624 was separately validated in Section 22.
+
+Event ID 4625 was not observed during this validation. Therefore, failed-logon auditing was verified through effective policy configuration, but failed-logon event generation was not independently confirmed.
+
+### Result
+
+Windows Security Auditing Policy was confirmed as enabled and applied.
+
+Successful network logon auditing and Kerberos service ticket auditing were validated through Event Viewer.
+
+**Status: PASS — Audit configuration and successful event logging**
+
+**Pending: Event 4625 failure-event validation**
+
+
+
+## 24. Active Directory Organization and Group Policy Links
+
+### Objective
+
+Verify the organizational structure of the Mason-Troy Active Directory environment and the Group Policy links used to manage workstations at both sites.
+
+### Active Directory Organization
+
+The `masonmfg.internal` domain contains separate organizational units for the Mason and Troy sites.
+
+Active Directory Users and Computers was used to verify the site OU hierarchy and the presence of the respective test user accounts.
+
+![Mason-Troy OU Structure](../screenshots/active-directory/mason-ad-ou-structure.png)
+
+![Mason User Accounts](../screenshots/active-directory/mason-ad-user-accounts.png)
+
+![Troy User Accounts](../screenshots/active-directory/troy--ad-user-accounts.png)
+
+### Mason Workstation Group Policy
+
+The Mason Computers OU has the following linked policy:
+
+- Domain Workstation Security Baseline
+
+The GPO link was verified as enabled, with GPO Status Enabled and Enforced set to No.
+
+![Mason Computer GPO Link](../screenshots/security/mason-computers-GPO-baseline-link.png)
+
+### Troy Workstation Group Policy
+
+The Troy Computers OU contains two enabled policy links:
+
+- Troy Workstation Policy
+- Domain Workstation Security Baseline
+
+Both links were verified as enabled, with GPO Status Enabled and Enforced set to No.
+
+![Troy Computer GPO Links](../screenshots/security/troy-computers-GPO-policy-links.png)
+
+### Result
+
+The domain's Mason and Troy organizational structure and workstation GPO links were verified through Active Directory Users and Computers and Group Policy Management.
+
+Previous endpoint testing separately confirmed application of the shared workstation baseline and Troy-specific restrictions.
+
+**Status: PASS**
+
+
+
+## 25. DNS Configuration and External Resolution
+
+### Objective
+
+Verify that the Mason Windows Server provides internal Active Directory DNS records for both enterprise sites and successfully resolves external domain names.
+
+### Internal DNS Configuration
+
+The Windows Server 2025 domain controller hosts the `masonmfg.internal` forward lookup zone.
+
+DNS Manager confirmed records for:
+
+- `MASON-WIN11-01` — `10.10.20.101`
+- `Troy-Win11-01` — `10.20.20.100`
+- `ubuntu` — `10.10.30.20`
+- `WIN-F40P5E8HDVL` — `10.10.30.10`
+
+Active Directory DNS folders, including `_msdcs`, `_sites`, `_tcp`, and `_udp`, were also present.
+
+![Active Directory DNS Records](../screenshots/dns/mason-ad-DNS-forwarding-lookup-zone.png)
+
+### DNS Forwarder Configuration
+
+DNS Manager confirmed that `8.8.8.8` was configured as an external DNS forwarder.
+
+Root hints fallback was also enabled.
+
+Additional IPv6 placeholder entries were present but did not successfully resolve during inspection.
+
+![DNS Forwarder Configuration](../screenshots/dns/mason-dns-forwarder-config.png)
+
+### External DNS Resolution Test
+
+The following command was executed on the Mason Windows Server:
+
+`nslookup google.com 10.10.30.10`
+
+The internal DNS server returned a successful non-authoritative answer containing IPv4 and IPv6 addresses.
+
+![External DNS Resolution](../screenshots/dns/mason-dns-external-resolution-success.png)
+
+### Result
+
+The Mason DNS server successfully maintained internal enterprise DNS records and resolved an external domain.
+
+**Status: PASS**
+
+
 ---
 
 
 
 ## Validation Still Required
 
-- Complete CompanyShare validation from the Troy Windows 11 workstation, including investigating the remaining File Explorer access restriction. PowerShell-based SMB authentication and file read/create/delete operations were previously validated successfully.
+
+- Investigate the earlier File Explorer restriction when accessing `CompanyShare` through direct UNC navigation. Cross-site SMB authentication, mapped-drive access, and file modification have been successfully validated in Sections 20–22.
 
 - Perform additional FortiGate firewall policy validation
 
