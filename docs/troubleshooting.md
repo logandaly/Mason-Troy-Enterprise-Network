@@ -1016,6 +1016,66 @@ A suspected cause should not be presented as confirmed until supported by troubl
 
 
 
+## Case 14 — Troy SMB Shared-Folder Access Restriction
+
+### Problem
+
+The Troy Windows 11 workstation encountered an access restriction when attempting to open the Mason Windows Server's CompanyShare resource through direct UNC navigation in File Explorer.
+
+### Symptoms
+
+- The Troy client had working connectivity to the Mason domain controller at `10.10.30.10`.
+- TCP port 445 was reachable.
+- Direct access to `\\10.10.30.10\CompanyShare` produced an access restriction message.
+- Normal File Explorer network browsing did not provide the expected access.
+
+### Investigation
+
+The troubleshooting process distinguished network reachability from file-sharing access.
+
+The Troy client was already joined to `masonmfg.internal` and authenticated as `MASONMFG\test.employee`.
+
+Active Directory security group membership and the server's share configuration were examined during subsequent validation.
+
+The test account belonged to `Shared-Resources-Group`, which had NTFS Modify permissions and SMB Change and Read permissions on CompanyShare.
+
+### Workaround
+
+The shared folder was successfully mapped using PowerShell:
+
+`New-PSDrive -Name Z -PSProvider FileSystem -Root "\\WIN-F40P5E8HDVL\CompanyShare" -Persist`
+
+The mapped drive appeared as `Z:` in File Explorer.
+
+### Validation
+
+- The Troy user successfully accessed the mapped CompanyShare drive.
+- The user modified and saved the `Company Information` file.
+- The updated file was opened on the Mason Windows Server, confirming the cross-site modification.
+- Windows Security Event 4624 separately confirmed successful network authentication by `MASONMFG\test.employee` from `10.20.20.100`.
+
+### Root Cause
+
+The exact cause of the original direct UNC navigation restriction was not determined.
+
+The successful mapped-drive test confirms that SMB connectivity and authorized file modification were operational, but does not establish why the original navigation method was restricted.
+
+### Resolution Status
+
+**SMB file access validated — original UNC navigation restriction unresolved.**
+
+No unsupported root-cause claim is made.
+
+### Lesson Learned
+
+Successful TCP connectivity does not by itself establish application-level access.
+
+When troubleshooting file-sharing problems, distinguish network reachability, domain authentication, share and NTFS permissions, and the method used to access the resource.
+
+A successful alternative access method can validate service functionality without necessarily resolving the original error.
+
+
+
 
 
 

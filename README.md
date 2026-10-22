@@ -111,49 +111,55 @@ The environment combines physical Cisco networking equipment with virtualized in
 \### Completed
 
 
+
+## Current Project Status
+
 ### Completed
 
 - Physical Mason and Troy Cisco network infrastructure
-- VLAN creation and initial network segmentation
+- VLAN configuration and initial network segmentation
 - Mason router-on-a-stick inter-VLAN routing
 - Troy Layer 3 switching and inter-VLAN routing
-- Routed WAN connection between Mason and Troy
-- OSPF adjacency and bidirectional route propagation between sites
+- Routed Mason-Troy WAN connection
+- OSPF adjacency and bidirectional dynamic route propagation
 - OSPF default-route advertisement from Mason to Troy
-- GNS3 integration with the physical network
-- Windows Server 2025 deployment
-- Ubuntu Server deployment
-- Active Directory Domain Services deployment
-- `masonmfg.internal` Active Directory forest and domain
-- Active Directory organizational unit and security group structure
-- AD-integrated DNS with forward and reverse lookup validation
-- Windows security auditing through Group Policy and Advanced Audit Policy
-- Kea DHCP service on Ubuntu Server
-- DHCP relay from Troy to the centralized Kea server
-- Successful DHCP assignment to the Troy Windows 11 client
-- FortiGate integration, NAT, and Internet connectivity
-- End-to-end Internet connectivity from the Troy site
-- Windows 11 Troy workstation joined to `masonmfg.internal`
-- Domain authentication using a Troy employee account
-- Troy user Group Policy application and behavioral validation
-- Domain workstation security baseline application and validation
-- Bidirectional communication between Mason and Troy infrastructure
+- GNS3 integration with physical Cisco infrastructure
+- Windows Server 2025 and Ubuntu Server deployment
+- Active Directory Domain Services and `masonmfg.internal` domain
+- Mason and Troy organizational units, users, and security groups
+- AD-integrated DNS, reverse DNS, and external DNS resolution
+- Centralized Kea DHCP configuration for all six VLANs
+- Successful DHCP lease validation across all six VLANs
+- DHCP relay between routed networks and the Kea server
+- Mason and Troy Windows 11 Pro workstation deployment
+- Active Directory domain join and authentication at both sites
+- Domain Workstation Security Baseline application
+- Troy Run restriction and Settings About-page restriction validation
+- Windows Advanced Audit Policy configuration and successful event logging
+- Kerberos service ticket auditing
+- Cross-site SMB file sharing through CompanyShare
+- Shared-resource security group membership validation
+- NTFS and SMB share permission validation
+- Successful file modification from Troy and verification on Mason Server
+- Previously validated FortiGate NAT and Internet connectivity
+- Cisco and GNS3 troubleshooting with documented findings and resolutions
 
 ### In Progress / Planned
 
-- Expand centralized Kea DHCP scopes to additional Mason and Troy VLANs
-- Complete remaining workstation Group Policy validation
-- Validate domain-based file sharing across the Mason-Troy WAN
-- Legacy Windows XP / manufacturing network integration
-- Legacy/OT VLAN isolation using extended ACLs
-- ACL before-and-after connectivity validation
-- Additional firewall security policy validation
-- Network device hardening
-- Centralized logging and monitoring
-- Python/Netmiko network automation
-- Wireshark validation and troubleshooting
-- Final end-to-end security testing
-- Architecture diagrams and final project documentation
+- Revalidate and troubleshoot FortiGate VLAN 40 transit connectivity
+- Enable FortiGate outbound firewall policy logging
+- Complete FortiGate management hardening
+- Integrate the legacy Windows XP manufacturing system
+- Implement Troy Legacy/OT VLAN 30 isolation using extended ACLs
+- Perform before-and-after Legacy/OT isolation tests
+- Complete remaining Mason-specific Group Policy validation
+- Investigate the remaining direct UNC navigation restriction for CompanyShare
+- Implement additional network device security and hardening
+- Configure centralized logging and monitoring
+- Develop Python/Netmiko monitoring and configuration backup automation
+- Complete additional Wireshark analysis and security validation
+- Perform final end-to-end connectivity and security testing
+- Complete architecture diagrams and final project documentation
 
 
 

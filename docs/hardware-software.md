@@ -20,7 +20,8 @@ This document identifies the physical hardware, virtual infrastructure, operatin
 
 | TROY-SW1 | Cisco Catalyst WS-C3560-24PS-S | Troy | Layer 3 switching, Troy inter-VLAN routing, and OSPF WAN connectivity |
 
-| Legacy Manufacturing System | Windows XP physical system | Troy | Legacy manufacturing/OT endpoint requiring network isolation |
+| Legacy Manufacturing System | Windows XP physical system (planned integration) | Troy | Legacy manufacturing/OT endpoint; VLAN 30 isolation and ACL validation pending |
+
 
 
 
@@ -87,21 +88,30 @@ A desktop computer is available at the Troy site for endpoint and virtualization
 \### Windows Server 2025
 
 
-
 Windows Server 2025 Standard Evaluation provides the primary Microsoft enterprise services for the Mason network.
 
 
+**Current roles:**
 
-\*\*Current roles:\*\*
+- Active Directory Domain Services (AD DS)
+- DNS Server
+- Domain Controller for `masonmfg.internal`
+- Global Catalog
+- Group Policy management for Mason and Troy workstations
+- Windows Security auditing and Event Viewer logging
+- SMB file sharing through `CompanyShare`
+- Active Directory security group-based resource access control
 
-\- Active Directory Domain Services (AD DS)
+**Validated functionality:**
 
-\- DNS Server
-
-\- Domain Controller for `masonmfg.internal`
-
-\- Global Catalog
-
+- Domain authentication from Mason and Troy Windows 11 workstations
+- Active Directory OU and security group organization
+- Workstation Group Policy application
+- Successful cross-site SMB file access and modification
+- NTFS and SMB share permissions
+- Windows Security Events 4624 and 4769
+- Success and Failure logon auditing configuration
+- Internal DNS and external domain resolution
 
 
 \*\*Network configuration:\*\*
@@ -114,6 +124,29 @@ Windows Server 2025 Standard Evaluation provides the primary Microsoft enterpris
 
 
 
+### Windows 11 Enterprise Workstations
+
+Two Windows 11 Pro virtual machines provide employee endpoint testing at the Mason and Troy sites.
+
+| Workstation | Site | VLAN | Operating System |
+|---|---|---|---|
+| MASON-WIN11-01 | Mason | 20 — Employees | Windows 11 Pro |
+| TROY-WIN11-01 | Troy | 20 — Employees | Windows 11 Pro |
+
+**Validated functionality:**
+
+- Centralized Kea DHCP address assignment
+- Active Directory domain membership
+- Domain user authentication
+- Group Policy application
+- Cross-site connectivity and DNS resolution
+
+The Troy workstation was additionally used to validate cross-site SMB file sharing with the Mason Windows Server.
+
+Both workstations run as virtual machines within the GNS3 environment.
+
+
+
 \### Ubuntu Server
 
 
@@ -122,15 +155,21 @@ Ubuntu Server provides Linux-based infrastructure services and will support addi
 
 
 
-\*\*Current and planned roles:\*\*
 
-\- Kea DHCP
+**Implemented services:**
 
-\- Centralized syslog collection
+- Kea DHCPv4 — centralized DHCP for all six Mason and Troy VLANs
+- DHCP service administration through Ubuntu Server
 
-\- NTP
+**Planned services:**
 
-\- SSH administration
+- Centralized syslog collection
+- NTP time synchronization
+- Additional Linux-based monitoring services
+
+**Administration:**
+
+- SSH-based remote administration
 
 
 
@@ -162,15 +201,24 @@ A FortiGate virtual firewall provides the security edge between the enterprise n
 
 
 
-\*\*Planned responsibilities:\*\*
+**Implemented functionality:**
 
-\- Internet edge security
+- Centralized Internet security edge for the Mason-Troy enterprise
+- Internal-to-Internet firewall policy
+- Network Address Translation (NAT)
+- Static routing toward internal enterprise networks
+- Previously validated Internet connectivity from Mason and Troy
 
-\- Firewall policy enforcement
+**Current validation status:**
 
-\- Controlled outbound Internet access
+The FortiGate Internet path was previously operational. A subsequent ARP failure on the `10.10.40.0/30` transit network remains unresolved and requires revalidation.
 
-\- Additional protection between trusted enterprise networks and external networks
+**Planned enhancements:**
+
+- Explicit outbound firewall policy logging
+- Basic firewall management hardening
+- Additional security validation
+
 
 
 

@@ -472,3 +472,57 @@ Both sites now have domain-joined endpoints capable of using centralized Active 
 
 The troubleshooting process also demonstrated practical experience with QEMU disk images, virtualization templates, Windows Sysprep, DHCP relay, and Active Directory computer management.
 
+
+
+
+---
+
+## Milestone 13 — Cross-Site File Sharing and Windows Server Security Validation
+
+### Completed
+
+- Verified Active Directory organizational units for Mason and Troy.
+- Confirmed Mason and Troy test-user membership in Shared-Resources-Group.
+- Verified NTFS Modify, Read, and Write permissions on CompanyShare.
+- Verified SMB share-level Change and Read permissions.
+- Successfully mapped CompanyShare from the Troy Windows 11 workstation.
+- Modified a shared file from Troy and verified the changes on Mason Windows Server.
+- Confirmed Windows Security Event 4624 for the Troy employee account.
+- Verified Network Logon Type 3 and source address `10.20.20.100`.
+- Confirmed successful Kerberos service ticket auditing through Event ID 4769.
+- Verified Success and Failure logon auditing using `auditpol`.
+- Confirmed enabled workstation GPO links for Mason and Troy.
+- Confirmed the Windows Security Auditing Policy link on the Domain Controllers OU.
+- Verified internal Active Directory DNS records for Mason and Troy.
+- Verified external DNS resolution through the Mason DNS server.
+
+### Validation
+
+The Troy workstation successfully accessed the Mason CompanyShare resource using domain authentication.
+
+A shared file was modified from Troy, and the changes were subsequently verified on the Mason Windows Server.
+
+Active Directory group membership and both NTFS and SMB share permissions were inspected to confirm the configured access controls.
+
+Windows Security Event 4624 confirmed successful network authentication by `MASONMFG\test.employee` from the Troy workstation.
+
+Kerberos Event 4769 and the effective Windows audit policy provided additional authentication and auditing evidence.
+
+External DNS resolution was validated using:
+
+`nslookup google.com 10.10.30.10`
+
+### Outstanding Items
+
+- The original direct UNC navigation restriction remains unexplained, although mapped-drive access and file modification are working.
+- Event ID 4625 was not observed; failure auditing was confirmed through policy configuration rather than event generation.
+- Legacy/OT isolation, additional FortiGate hardening, and network automation remain separate project tasks.
+
+### Result
+
+**Status: PASS — Cross-site SMB access, authentication auditing, DNS, and security configuration validation**
+
+The enterprise now has documented evidence of centrally managed user identities, group-based file permissions, cross-site resource access, security event logging, and DNS services.
+
+Supporting screenshots and detailed test results are recorded in [Network Validation](validation.md).
+

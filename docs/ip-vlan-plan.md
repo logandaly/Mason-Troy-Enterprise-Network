@@ -46,6 +46,23 @@ This document defines the VLAN and IPv4 addressing scheme used throughout the Ma
 
 
 
+### FortiGate Transit Network
+
+The FortiGate connects to MASON-R1 through a dedicated VLAN 40 transit network.
+
+| Device | Interface / Role | IP Address |
+|---|---|---|
+| MASON-R1 | GigabitEthernet0/0.40 | 10.10.40.2/30 |
+| FortiGate | port3 | 10.10.40.1/30 |
+
+- VLAN: 40 — FIREWALL-TRANSIT
+- Subnet: `10.10.40.0/30`
+- Purpose: Routed connection between the internal enterprise network and the FortiGate security edge.
+
+**Validation status:** Previously operational; a subsequent ARP connectivity failure remains unresolved. See [Troubleshooting Case 13](troubleshooting.md).
+
+
+
 ## Troy — Manufacturing Facility
 
 
@@ -131,6 +148,29 @@ The addressing scheme was designed to make each site and network function easy t
 - VLAN 999 is reserved as the native VLAN and is not intended for endpoint traffic.
 
 - The `10.255.0.0/30` network is dedicated to the point-to-point WAN connection between Mason and Troy.
+
+
+
+## Windows 11 Enterprise Workstation Addressing
+
+Both enterprise sites have Windows 11 Pro workstations joined to the `masonmfg.internal` Active Directory domain.
+
+Their IPv4 configurations are assigned dynamically by the centralized Kea DHCP server.
+
+| Workstation | Site | VLAN | Validated IPv4 Address | Default Gateway |
+|---|---|---|---|---|
+| MASON-WIN11-01 | Mason | 20 — Employees | 10.10.20.101/24 | 10.10.20.1 |
+| TROY-WIN11-01 | Troy | 20 — Employees | 10.20.20.100/24 | 10.20.20.1 |
+
+Both workstations use:
+
+- DHCP Server: `10.10.30.20`
+- DNS Server: `10.10.30.10`
+- DNS Suffix: `masonmfg.internal`
+
+These are observed DHCP addresses, not permanently assigned static addresses. They may change when leases are renewed.
+
+The Mason and Troy workstations have successfully joined the domain and applied the shared workstation security baseline.
 
 
 ## Centralized DHCP Addressing

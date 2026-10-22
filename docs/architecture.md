@@ -66,9 +66,16 @@ Mason serves as the corporate headquarters and hosts the project's primary serve
 
 \- \*\*Windows Server 2025\*\*
 
-&#x20; - Located in Mason VLAN 30.
 
-&#x20; - Provides Active Directory Domain Services and DNS.
+- **Windows Server 2025**
+  - Located in Mason VLAN 30 at `10.10.30.10`.
+  - Hosts Active Directory Domain Services for `masonmfg.internal`.
+  - Provides centralized DNS for Mason and Troy.
+  - Hosts the `CompanyShare` SMB shared folder.
+  - Uses Active Directory security groups and NTFS/share permissions to control shared-resource access.
+  - Provides centralized Group Policy management for domain-joined Windows workstations.
+  - Records Windows Security events for authentication, Kerberos activity, and other configured audit categories.
+  - Successfully authenticated a Troy domain user accessing shared resources across the routed WAN.
 
 
 
@@ -77,6 +84,18 @@ Mason serves as the corporate headquarters and hosts the project's primary serve
 &#x20; - Located in Mason VLAN 30.
 
 &#x20; - Provides centralized Kea DHCP and other Linux-based infrastructure services.
+
+
+
+
+- **MASON-WIN11-01 — Windows 11 Pro Workstation**
+  - Located in Mason VLAN 20 — Employees.
+  - Receives IP configuration from the centralized Kea DHCP server.
+  - Joined to the `masonmfg.internal` Active Directory domain.
+  - Computer account resides in `MasonMFG → Mason → Computers`.
+  - Uses `MASONMFG\test.manager` for domain authentication testing.
+  - Receives the Domain Workstation Security Baseline through Group Policy.
+  - Provides a Mason-side endpoint for validating centralized authentication, security policies, and enterprise connectivity.
 
 
 
@@ -322,3 +341,22 @@ End-to-end Internet connectivity has been validated from TROY-WIN11-01 using a s
 The FortiGate remains the centralized policy enforcement point for traffic leaving the enterprise network.
 
 The legacy Windows XP manufacturing environment at Troy will not receive normal unrestricted Internet access. Planned extended ACL and firewall controls will enforce least-privilege isolation for the Legacy/OT VLAN.
+
+
+### FortiGate Transit Validation Status
+
+The FortiGate Internet path was previously validated through successful external connectivity tests from Mason infrastructure and the Troy Windows 11 workstation.
+
+During subsequent testing, connectivity across the dedicated `10.10.40.0/30` transit network failed.
+
+- MASON-R1 transit address: `10.10.40.2/30`
+- FortiGate port3 address: `10.10.40.1/30`
+- Both interfaces appeared operational.
+- MASON-R1 reported an incomplete ARP entry for `10.10.40.1`.
+- Bidirectional transit connectivity failed.
+
+The exact root cause has not been established, and restoration of this specific transit connection has not been independently validated.
+
+The earlier successful Internet tests remain valid historical evidence, but current FortiGate transit connectivity requires revalidation.
+
+Further investigation is documented in [Troubleshooting Case 13](troubleshooting.md).
