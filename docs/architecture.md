@@ -1,4 +1,4 @@
-\# Network Architecture
+﻿# Network Architecture
 
 
 
@@ -6,7 +6,7 @@ This document describes the physical and virtual architecture of the Mason-Troy 
 
 
 
-\## Overall Design
+## Overall Design
 
 
 
@@ -14,9 +14,9 @@ The project represents a two-site enterprise and manufacturing environment consi
 
 
 
-\- \*\*Mason, Ohio — Corporate Headquarters\*\*
+- **Mason, Ohio — Corporate Headquarters**
 
-\- \*\*Troy, Ohio — Manufacturing Facility\*\*
+- **Troy, Ohio — Manufacturing Facility**
 
 
 
@@ -28,7 +28,7 @@ Mason uses router-on-a-stick inter-VLAN routing through MASON-R1, while Troy use
 
 
 
-\## Mason Architecture
+## Mason Architecture
 
 
 
@@ -36,35 +36,32 @@ Mason serves as the corporate headquarters and hosts the project's primary serve
 
 
 
-\### Network Components
+### Network Components
 
 
 
-\- \*\*MASON-R1 — Cisco 2901\*\*
+- **MASON-R1 — Cisco 2901**
 
-&#x20; - Provides router-on-a-stick inter-VLAN routing.
+   - Provides router-on-a-stick inter-VLAN routing.
 
-&#x20; - Acts as the Mason endpoint of the routed WAN.
+   - Acts as the Mason endpoint of the routed WAN.
 
-&#x20; - Advertises Mason networks into OSPF.
+   - Advertises Mason networks into OSPF.
 
-&#x20; - Provides the upstream path toward the FortiGate security edge and Internet.
-
-
-
-\- \*\*MASON-SW1 — Cisco Catalyst 3560\*\*
-
-&#x20; - Operates as a Layer 2 access switch.
-
-&#x20; - Provides VLAN connectivity for management, employee, and server networks.
-
-&#x20; - Uses an 802.1Q trunk to MASON-R1.
-
-&#x20; - Uses an additional 802.1Q trunk to connect physical VLANs with the GNS3 virtual environment.
+   - Provides the upstream path toward the FortiGate security edge and Internet.
 
 
 
-\- \*\*Windows Server 2025\*\*
+- **MASON-SW1 — Cisco Catalyst 3560**
+
+   - Operates as a Layer 2 access switch.
+
+   - Provides VLAN connectivity for management, employee, and server networks.
+
+   - Uses an 802.1Q trunk to MASON-R1.
+
+   - Uses an additional 802.1Q trunk to connect physical VLANs with the GNS3 virtual environment.
+
 
 
 - **Windows Server 2025**
@@ -79,11 +76,11 @@ Mason serves as the corporate headquarters and hosts the project's primary serve
 
 
 
-\- \*\*Ubuntu Server\*\*
+- **Ubuntu Server**
 
-&#x20; - Located in Mason VLAN 30.
+   - Located in Mason VLAN 30.
 
-&#x20; - Provides centralized Kea DHCP and other Linux-based infrastructure services.
+   - Provides centralized Kea DHCP and other Linux-based infrastructure services.
 
 
 
@@ -99,21 +96,21 @@ Mason serves as the corporate headquarters and hosts the project's primary serve
 
 
 
-\### Mason VLANs
+### Mason VLANs
 
 
 
-\- VLAN 10 — Management
+- VLAN 10 — Management
 
-\- VLAN 20 — Employees
+- VLAN 20 — Employees
 
-\- VLAN 30 — Servers
+- VLAN 30 — Servers
 
-\- VLAN 999 — Native VLAN
+- VLAN 999 — Native VLAN
 
 
 
-\## Troy Architecture
+## Troy Architecture
 
 
 
@@ -121,65 +118,87 @@ Troy represents the manufacturing facility and contains both standard business s
 
 
 
-\### Network Components
+### Network Components
 
 
 
-\- \*\*TROY-SW1 — Cisco Catalyst 3560\*\*
+- **TROY-SW1 — Cisco Catalyst 3560**
 
-&#x20; - Operates as a Layer 3 switch.
+   - Operates as a Layer 3 switch.
 
-&#x20; - Provides the default gateways for Troy VLANs using switched virtual interfaces (SVIs).
+   - Provides the default gateways for Troy VLANs using switched virtual interfaces (SVIs).
 
-&#x20; - Performs inter-VLAN routing.
+   - Performs inter-VLAN routing.
 
-&#x20; - Acts as the Troy endpoint of the routed WAN.
+   - Acts as the Troy endpoint of the routed WAN.
 
-&#x20; - Participates directly in OSPF Area 0 with MASON-R1.
-
-
-
-\- \*\*Employee Systems\*\*
-
-&#x20; - Located in VLAN 20.
-
-&#x20; - Provide normal business connectivity at the manufacturing facility.
-
-&#x20; - TROY-WIN11-01 provides the current Windows 11 enterprise client used for DHCP, Active Directory, Group Policy, DNS, and routed connectivity validation.
-
-&#x20; - TROY-WIN11-01 receives centralized DHCP service from the Mason Ubuntu Server through DHCP relay on TROY-SW1.
+   - Participates directly in OSPF Area 0 with MASON-R1.
 
 
 
+- **Employee Systems**
 
+   - Located in VLAN 20.
 
-\- \*\*Legacy Windows XP Manufacturing System\*\*
+   - Provide normal business connectivity at the manufacturing facility.
 
-&#x20; - Located in VLAN 30 — Legacy/OT.
+   - TROY-WIN11-01 provides the current Windows 11 enterprise client used for DHCP, Active Directory, Group Policy, DNS, and routed connectivity validation.
 
-&#x20; - Represents an older system that remains necessary for manufacturing operations.
-
-&#x20; - Will be isolated from unnecessary enterprise and Internet access using VLAN segmentation, extended ACLs, and firewall policies.
-
-&#x20; - Only explicitly required communication will be permitted once the security policy is implemented.
-
-
-
-\### Troy VLANs
+   - TROY-WIN11-01 receives centralized DHCP service from the Mason Ubuntu Server through DHCP relay on TROY-SW1.
 
 
 
-\- VLAN 10 — Management
-
-\- VLAN 20 — Employees
-
-\- VLAN 30 — Legacy/OT
-
-\- VLAN 999 — Native VLAN
 
 
+- **Legacy Windows XP Manufacturing System**
 
-\## WAN and Dynamic Routing
+   - Located in VLAN 30 — Legacy/OT.
+
+   - Represents an older system that remains necessary for manufacturing operations.
+
+- The legacy Windows XP manufacturing endpoint is assigned to Troy VLAN 30 (`10.20.30.0/24`).
+- TROY-SW1 enforces bidirectional routed isolation using extended ACLs:
+  - `TROY-OT-IN` restricts traffic originating from the Legacy/OT VLAN.
+  - `TROY-OT-OUT` restricts routed traffic entering the Legacy/OT VLAN.
+- Before-and-after connectivity tests confirmed that the ACLs restrict communication between the Legacy/OT network and other routed enterprise networks.
+- ACL deny counters increased during controlled testing, providing evidence of enforcement.
+- Devices within the same Legacy/OT VLAN can still communicate locally through Layer 2 switching.
+- DHCP functionality was validated before ACL deployment; DHCP operation after applying the ACLs remains unverified.
+- The isolation design limits the legacy environment's exposure to other enterprise networks and external destinations.
+
+
+### Troy Switch Security Hardening
+
+TROY-SW1 implements additional Layer 2 and management-plane security controls to protect the manufacturing network.
+
+- **Port security:** Configured on 12 access ports, allowing a maximum of one learned MAC address per port with violation mode set to `restrict`.
+- **PortFast:** Enabled on designated access ports to allow connected endpoints to transition promptly into forwarding.
+- **BPDU Guard:** Configured on designated access ports to protect against unexpected spanning-tree participation.
+- **SSH management:** SSH version 2 is enabled for encrypted remote administration.
+- **Web management:** HTTP and HTTPS management services are disabled.
+
+Configuration and operational checks confirmed these controls were enabled.
+
+Unauthorized MAC address enforcement, BPDU Guard violation behavior, and Telnet rejection were not independently tested. These remain validation opportunities rather than confirmed behavioral results.
+
+Supporting configuration and verification screenshots are documented in [Validation Evidence](validation.md).
+
+
+### Troy VLANs
+
+
+
+- VLAN 10 — Management
+
+- VLAN 20 — Employees
+
+- VLAN 30 — Legacy/OT
+
+- VLAN 999 — Native VLAN
+
+
+
+## WAN and Dynamic Routing
 
 
 
@@ -187,19 +206,19 @@ Mason and Troy are connected using a routed point-to-point WAN network.
 
 
 
-\### WAN Addressing
+### WAN Addressing
 
 
 
-\- Network: `10.255.0.0/30`
+- Network: `10.255.0.0/30`
 
-\- MASON-R1: `10.255.0.1`
+- MASON-R1: `10.255.0.1`
 
-\- TROY-SW1: `10.255.0.2`
+- TROY-SW1: `10.255.0.2`
 
 
 
-\### OSPF
+### OSPF
 
 
 
@@ -213,13 +232,13 @@ MASON-R1 advertises:
 
 
 
-\- `10.10.10.0/24` — Mason Management
+- `10.10.10.0/24` — Mason Management
 
-\- `10.10.20.0/24` — Mason Employees
+- `10.10.20.0/24` — Mason Employees
 
-\- `10.10.30.0/24` — Mason Servers
+- `10.10.30.0/24` — Mason Servers
 
-\- `10.255.0.0/30` — WAN
+- `10.255.0.0/30` — WAN
 
 
 
@@ -227,13 +246,13 @@ TROY-SW1 advertises:
 
 
 
-\- `10.20.10.0/24` — Troy Management
+- `10.20.10.0/24` — Troy Management
 
-\- `10.20.20.0/24` — Troy Employees
+- `10.20.20.0/24` — Troy Employees
 
-\- `10.20.30.0/24` — Troy Legacy/OT
+- `10.20.30.0/24` — Troy Legacy/OT
 
-\- `10.255.0.0/30` — WAN
+- `10.255.0.0/30` — WAN
 
 
 
@@ -241,7 +260,7 @@ A full OSPF adjacency has been established between MASON-R1 and TROY-SW1. Bidire
 
 
 
-\## Physical and Virtual Network Integration
+## Physical and Virtual Network Integration
 
 
 
@@ -257,7 +276,7 @@ The USB-to-Ethernet adapter connects to MASON-SW1 Fa0/5, which is configured as 
 
 
 
-\### Virtual-to-Physical Traffic Path
+### Virtual-to-Physical Traffic Path
 
 
 
@@ -273,17 +292,17 @@ This design allows virtual systems to participate directly in the same VLAN and 
 
 
 
-\### Current Virtual Switch Layout
+### Current Virtual Switch Layout
 
 
 
-\- Ports 2–3 — Access VLAN 10
+- Ports 2–3 — Access VLAN 10
 
-\- Ports 5–7 — Access VLAN 20
+- Ports 5–7 — Access VLAN 20
 
-\- Ports 9–11 — Access VLAN 30
+- Ports 9–11 — Access VLAN 30
 
-\- Port 12 — 802.1Q trunk toward the physical Mason network
+- Port 12 — 802.1Q trunk toward the physical Mason network
 
 
 
@@ -294,7 +313,9 @@ Windows Server 2025 currently connects through port 9, and Ubuntu Server connect
 
 Kea DHCP runs on the Mason Ubuntu Server at `10.10.30.20`.
 
-Troy uses DHCP relay to obtain centralized address configuration across the routed WAN. TROY-SW1 VLAN 20 is configured with:
+Troy uses DHCP relay to obtain centralized address configuration across the routed WAN. TROY-SW1 has DHCP relay configured on its VLAN interfaces, forwarding client requests to the Kea DHCP server at `10.10.30.20`.
+
+DHCP address assignment has been validated for Troy VLAN 20 and VLAN 30. The VLAN 30 Legacy/OT DHCP test succeeded before deployment of the isolation ACLs; DHCP functionality after ACL deployment remains unverified.
 
 `ip helper-address 10.10.30.20`
 
@@ -320,6 +341,18 @@ MASON-R1 connects the internal routed enterprise network to the FortiGate throug
 
 The FortiGate maintains routing toward the internal enterprise networks and provides firewall policy enforcement and NAT for Internet-bound traffic.
 
+### FortiGate Security Policy Enforcement
+
+The FortiGate provides centralized firewall policy enforcement for traffic crossing the enterprise security boundary.
+
+- Configured firewall policies control permitted and denied traffic.
+- Firewall policy counters and traffic logs provide visibility into traffic matching those policies.
+- Controlled testing demonstrated permitted and denied traffic behavior.
+- Before-and-after screenshots documented changes in firewall policy counters. Counter increases demonstrate traffic matching the policies, not necessarily a firewall configuration change.
+- FortiGate firewall policy validation is documented separately from the unresolved Mason-to-FortiGate transit connectivity issue.
+
+The FortiGate transit network (`10.10.40.0/30`) requires revalidation before current end-to-end Internet connectivity can be considered confirmed.
+
 ### Internet Traffic Path
 
 Traffic from the Troy employee network follows the centralized path:
@@ -340,8 +373,9 @@ End-to-end Internet connectivity has been validated from TROY-WIN11-01 using a s
 
 The FortiGate remains the centralized policy enforcement point for traffic leaving the enterprise network.
 
-The legacy Windows XP manufacturing environment at Troy will not receive normal unrestricted Internet access. Planned extended ACL and firewall controls will enforce least-privilege isolation for the Legacy/OT VLAN.
+The Troy Legacy/OT VLAN 30 network is protected by implemented extended ACLs on TROY-SW1. Controlled before-and-after testing confirmed that these ACLs restrict routed communication with other enterprise networks and external destinations.
 
+FortiGate firewall policies provide additional security enforcement at the enterprise perimeter. The Legacy/OT ACL validation and FortiGate firewall policy validation are documented separately.
 
 ### FortiGate Transit Validation Status
 

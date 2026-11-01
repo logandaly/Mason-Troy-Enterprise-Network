@@ -95,7 +95,7 @@ The FortiGate connects to MASON-R1 through a dedicated VLAN 40 transit network.
 
 | TROY-SW1 | VLAN 30 Gateway | 10.20.30.1 |
 
-| Legacy Windows XP System | Manufacturing / OT Endpoint | 10.20.30.10 (Planned) |
+| Legacy Windows XP System | Manufacturing / OT Endpoint | 10.20.30.10 (Static) |
 
 
 
@@ -194,6 +194,7 @@ Six DHCP subnet configurations support the Mason and Troy locations. DHCP relay 
 ### DHCP Validation
 
 All six DHCP scopes were successfully validated through client-side testing using GNS3 VPC clients and Windows 11 endpoints.
+**Validation limitation:** All six DHCP scopes were successfully tested before deployment of the Troy VLAN 30 Legacy/OT isolation ACLs. DHCP functionality for Troy VLAN 30 has not been independently revalidated after ACL deployment. The existing DHCP results remain valid as pre-ACL evidence.
 
 | Site | VLAN | Validated DHCP Address | Status |
 |---|---|---|---|

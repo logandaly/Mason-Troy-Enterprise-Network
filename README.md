@@ -1,8 +1,8 @@
-\# Mason-Troy Enterprise Network
+﻿# Mason-Troy Enterprise Network
 
 
 
-\## Overview
+## Overview
 
 
 
@@ -16,43 +16,43 @@ The purpose of this project is to demonstrate the networking, systems administra
 
 
 
-\## Key Technologies
+## Key Technologies
 
 
 
-\- Cisco routing and switching
+- Cisco routing and switching
 
-\- VLAN segmentation
+- VLAN segmentation
 
-\- Inter-VLAN routing
+- Inter-VLAN routing
 
-\- OSPF dynamic routing
+- OSPF dynamic routing
 
-\- Extended access control lists (ACLs)
+- Extended access control lists (ACLs)
 
-\- FortiGate firewall
+- FortiGate firewall
 
-\- Windows Server 2025
+- Windows Server 2025
 
-\- Active Directory Domain Services (AD DS)
+- Active Directory Domain Services (AD DS)
 
-\- DNS
+- DNS
 
-\- Ubuntu Server
+- Ubuntu Server
 
-\- DHCP and DHCP relay
+- DHCP and DHCP relay
 
-\- GNS3 virtualization
+- GNS3 virtualization
 
-\- Python and Netmiko automation
+- Python and Netmiko automation
 
-\- Wireshark network analysis and validation
-
-
+- Wireshark network analysis and validation
 
 
 
-\## Network Architecture
+
+
+## Network Architecture
 
 
 
@@ -60,9 +60,9 @@ The network represents two business locations in Ohio:
 
 
 
-\- \*\*Mason — Corporate Headquarters:\*\* Hosts the primary server infrastructure, network services, security edge, and centralized management resources.
+- **Mason — Corporate Headquarters:** Hosts the primary server infrastructure, network services, security edge, and centralized management resources.
 
-\- \*\*Troy — Manufacturing Facility:\*\* Provides connectivity for standard business systems while maintaining a segmented legacy/OT environment for manufacturing equipment.
+- **Troy — Manufacturing Facility:** Provides connectivity for standard business systems while maintaining a segmented legacy/OT environment for manufacturing equipment.
 
 
 
@@ -76,39 +76,31 @@ The environment combines physical Cisco networking equipment with virtualized in
 
 
 
-\## Project Goals
+## Project Goals
 
 
 
-\- Design and implement a functional two-site enterprise network using physical and virtual infrastructure.
+- Design and implement a functional two-site enterprise network using physical and virtual infrastructure.
 
-\- Segment business, management, server, and manufacturing traffic using VLANs.
+- Segment business, management, server, and manufacturing traffic using VLANs.
 
-\- Provide dynamic routing between the Mason and Troy sites using OSPF.
+- Provide dynamic routing between the Mason and Troy sites using OSPF.
 
-\- Deploy centralized network services including Active Directory, DNS, and DHCP.
+- Deploy centralized network services including Active Directory, DNS, and DHCP.
 
-\- Provide controlled Internet connectivity through a FortiGate security firewall.
+- Provide controlled Internet connectivity through a FortiGate security firewall.
 
-\- Securely isolate the legacy Windows XP manufacturing environment using VLAN segmentation, ACLs, and firewall policies.
+- Securely isolate the legacy Windows XP manufacturing environment using VLAN segmentation, ACLs, and firewall policies.
 
-\- Apply network and switch hardening techniques to reduce unnecessary access and services.
+- Apply network and switch hardening techniques to reduce unnecessary access and services.
 
-\- Automate basic network administration and configuration backup tasks using Python and Netmiko.
+- Automate basic network administration and configuration backup tasks using Python and Netmiko.
 
-\- Validate network functionality and troubleshoot problems using Cisco IOS commands, server administration tools, and Wireshark.
+- Validate network functionality and troubleshoot problems using Cisco IOS commands, server administration tools, and Wireshark.
 
-\- Document the design, implementation, troubleshooting process, and validation results as a technical portfolio project.
-
-
+- Document the design, implementation, troubleshooting process, and validation results as a technical portfolio project.
 
 
-
-\## Current Project Status
-
-
-
-\### Completed
 
 
 
@@ -142,60 +134,79 @@ The environment combines physical Cisco networking equipment with virtualized in
 - NTFS and SMB share permission validation
 - Successful file modification from Troy and verification on Mason Server
 - Previously validated FortiGate NAT and Internet connectivity
+- Troy Legacy/OT VLAN 30 isolation using bidirectional extended ACLs
+- Before-and-after Legacy/OT connectivity testing and ACL deny-counter validation
+- FortiGate firewall policy enforcement, permitted/denied traffic testing, and traffic logging
+- Troy switch security hardening, including port security, PortFast, BPDU Guard, and SSHv2
+- Disabled HTTP and HTTPS management services on TROY-SW1
+- Documented 16 project milestones and 15 troubleshooting cases
 - Cisco and GNS3 troubleshooting with documented findings and resolutions
 
 ### In Progress / Planned
 
 - Revalidate and troubleshoot FortiGate VLAN 40 transit connectivity
-- Enable FortiGate outbound firewall policy logging
 - Complete FortiGate management hardening
-- Integrate the legacy Windows XP manufacturing system
-- Implement Troy Legacy/OT VLAN 30 isolation using extended ACLs
-- Perform before-and-after Legacy/OT isolation tests
 - Complete remaining Mason-specific Group Policy validation
 - Investigate the remaining direct UNC navigation restriction for CompanyShare
-- Implement additional network device security and hardening
 - Configure centralized logging and monitoring
 - Develop Python/Netmiko monitoring and configuration backup automation
 - Complete additional Wireshark analysis and security validation
 - Perform final end-to-end connectivity and security testing
 - Complete architecture diagrams and final project documentation
+- Revalidate DHCP functionality on Troy Legacy/OT VLAN 30 after ACL deployment
+- Complete optional behavioral testing of Troy switch port security, BPDU Guard, and Telnet rejection
+
+## Project Documentation and Evidence
+
+The following documents provide detailed implementation records, configuration information, troubleshooting investigations, and validation evidence for the Mason–Troy Enterprise Network.
+
+| Document | Description |
+|---|---|
+| [Network Architecture](docs/architecture.md) | Physical and virtual topology, routing, network services, and security architecture |
+| [IP Addressing and VLAN Plan](docs/ip-vlan-plan.md) | VLANs, subnets, gateways, DHCP scopes, and infrastructure addressing |
+| [Hardware and Software Inventory](docs/hardware-software.md) | Physical Cisco equipment, virtualization hosts, operating systems, and supporting tools |
+| [Project Milestones](docs/milestones.md) | 16 implementation milestones documenting project progress |
+| [Network Validation](docs/validation.md) | Connectivity, routing, DHCP, Active Directory, firewall, ACL, and security testing evidence |
+| [Troubleshooting Cases](docs/troubleshooting.md) | 15 documented troubleshooting investigations, including confirmed resolutions and unresolved issues |
+
+### Evidence and Validation
+
+The [Network Validation](docs/validation.md) document is the primary index of configuration screenshots, connectivity tests, and security validation evidence.
+
+The [Troubleshooting Cases](docs/troubleshooting.md) document records technical problems, diagnostic procedures, findings, resolutions, and lessons learned.
+
+Validation results distinguish successfully tested functionality from configuration-only verification and outstanding tests.
 
 
 
-\## Repository Structure
+## Repository Structure
 
 
 
-\- `automation/` — Python and Netmiko network automation scripts
+- `automation/` — Python and Netmiko network automation scripts
 
-\- `configs/` — Sanitized device configuration backups
+- `configs/` — Sanitized device configuration backups
 
-&#x20; - `mason/` — Mason router and switch configurations
+   - `mason/` — Mason router and switch configurations
 
-&#x20; - `troy/` — Troy switch configurations
+   - `troy/` — Troy switch configurations
 
-&#x20; - `fortigate/` — FortiGate configuration documentation
+   - `fortigate/` — FortiGate configuration documentation
 
-\- `diagrams/` — Network topology and architecture diagrams
+- `diagrams/` — Network topology and architecture diagrams
 
-\- `docs/` — Detailed project documentation
+- `docs/` — Detailed project documentation
 
-&#x20; - `architecture.md` — Physical and virtual network architecture
+   - `architecture.md` — Physical and virtual network architecture
 
-&#x20; - `hardware-software.md` — Hardware, operating systems, and software used
+   - `hardware-software.md` — Hardware, operating systems, and software used
 
-&#x20; - `ip-vlan-plan.md` — VLAN, subnet, gateway, and addressing plan
+   - `ip-vlan-plan.md` — VLAN, subnet, gateway, and addressing plan
 
-&#x20; - `milestones.md` — Project implementation progress
+   - `milestones.md` — Project implementation progress
 
-&#x20; - `troubleshooting.md` — Problems encountered, investigation, fixes, and lessons learned
+   - `troubleshooting.md` — Problems encountered, investigation, fixes, and lessons learned
 
-&#x20; - `validation.md` — Connectivity, routing, service, and security validation
+   - `validation.md` — Connectivity, routing, service, and security validation
 
-\- `screenshots/` — Supporting configuration and validation evidence
-
-
-
-
-
+- `screenshots/` — Supporting configuration and validation evidence

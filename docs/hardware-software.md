@@ -1,4 +1,4 @@
-\# Hardware and Software
+﻿# Hardware and Software
 
 
 
@@ -6,7 +6,7 @@ This document identifies the physical hardware, virtual infrastructure, operatin
 
 
 
-\## Physical Networking Hardware
+## Physical Networking Hardware
 
 
 
@@ -20,12 +20,12 @@ This document identifies the physical hardware, virtual infrastructure, operatin
 
 | TROY-SW1 | Cisco Catalyst WS-C3560-24PS-S | Troy | Layer 3 switching, Troy inter-VLAN routing, and OSPF WAN connectivity |
 
-| Legacy Manufacturing System | Windows XP physical system (planned integration) | Troy | Legacy manufacturing/OT endpoint; VLAN 30 isolation and ACL validation pending |
+| Legacy Manufacturing System | Windows XP physical system | Troy | Legacy manufacturing/OT endpoint in VLAN 30; static IP configuration and extended ACL isolation validated |
 
 
 
 
-\### Cisco Switch Roles
+### Cisco Switch Roles
 
 
 
@@ -37,11 +37,11 @@ This design allows the available physical hardware to be used according to its c
 
 
 
-\## Virtualization and Host Infrastructure
+## Virtualization and Host Infrastructure
 
 
 
-\### Primary Virtualization Host
+### Primary Virtualization Host
 
 
 
@@ -73,19 +73,32 @@ The laptop provides the bridge between the virtual GNS3 environment and the phys
 
 
 
-\### Secondary Host
+### Secondary Host
 
 
 
-A desktop computer is available at the Troy site for endpoint and virtualization duties as required. The system contains 32 GB of RAM and provides both wired Ethernet and Wi-Fi connectivity.
+The secondary virtualization host is a Windows 11 desktop computer used to support the Troy portion of the Mason-Troy Enterprise Network.
+
+**Hardware specifications:**
+- Processor: Intel Core i7-9700K
+- Memory: 32 GB DDR4
+- Operating system: Windows 11 Home
+- Network connectivity: Wired Ethernet, Wi-Fi, and USB-to-Ethernet adapter
+
+**Project responsibilities:**
+- Hosts GNS3 and its virtual networking infrastructure.
+- Supports the Troy Windows 11 virtual workstation.
+- Provides physical connectivity between GNS3 and TROY-SW1.
+- Supports endpoint testing, DHCP validation, and Legacy/OT VLAN 30 connectivity testing.
+- Provides an additional virtualization environment for troubleshooting and network validation.
 
 
 
-\## Virtual Systems and Software
+## Virtual Systems and Software
 
 
 
-\### Windows Server 2025
+### Windows Server 2025
 
 
 Windows Server 2025 Standard Evaluation provides the primary Microsoft enterprise services for the Mason network.
@@ -109,18 +122,21 @@ Windows Server 2025 Standard Evaluation provides the primary Microsoft enterpris
 - Workstation Group Policy application
 - Successful cross-site SMB file access and modification
 - NTFS and SMB share permissions
-- Windows Security Events 4624 and 4769
-- Success and Failure logon auditing configuration
+- Windows Security auditing configured through a dedicated Group Policy Object (GPO).
+- Advanced Audit Policy settings verified for authentication, Kerberos, user account management, security group management, computer account management, and directory service changes.
+- Security Event IDs 4624, 4625, 4768, 4769, 4738, 4728, 4729, 4737, and 5136 observed during validation.
+- Active Directory object-change auditing validated using an organizational unit (OU) System Access Control List (SACL) and Event ID 5136.
+- Computer Account Management auditing confirmed through effective policy settings; corresponding event generation was not independently tested.
 - Internal DNS and external domain resolution
 
 
-\*\*Network configuration:\*\*
+**Network configuration:**
 
-\- IP address: `10.10.30.10/24`
+- IP address: `10.10.30.10/24`
 
-\- Default gateway: `10.10.30.1`
+- Default gateway: `10.10.30.1`
 
-\- Mason VLAN 30 — Servers
+- Mason VLAN 30 — Servers
 
 
 
@@ -147,7 +163,7 @@ Both workstations run as virtual machines within the GNS3 environment.
 
 
 
-\### Ubuntu Server
+### Ubuntu Server
 
 
 
@@ -173,17 +189,17 @@ Ubuntu Server provides Linux-based infrastructure services and will support addi
 
 
 
-\*\*Network configuration:\*\*
+**Network configuration:**
 
-\- IP address: `10.10.30.20/24`
+- IP address: `10.10.30.20/24`
 
-\- Default gateway: `10.10.30.1`
+- Default gateway: `10.10.30.1`
 
-\- Mason VLAN 30 — Servers
+- Mason VLAN 30 — Servers
 
 
 
-\### FortiGate
+### FortiGate
 
 
 
@@ -191,13 +207,13 @@ A FortiGate virtual firewall provides the security edge between the enterprise n
 
 
 
-\*\*Platform:\*\*
+**Platform:**
 
-\- FortiGate-VM64-KVM
+- FortiGate-VM64-KVM
 
-\- FortiOS 7.4.12
+- FortiOS 7.4.12
 
-\- Hosted within GNS3
+- Hosted within GNS3
 
 
 
@@ -208,6 +224,9 @@ A FortiGate virtual firewall provides the security edge between the enterprise n
 - Network Address Translation (NAT)
 - Static routing toward internal enterprise networks
 - Previously validated Internet connectivity from Mason and Troy
+- Firewall policy logging and traffic monitoring
+- Validated permitted and denied traffic behavior
+- Firewall policy hit counters and traffic logs used as security validation evidence
 
 **Current validation status:**
 
@@ -215,14 +234,13 @@ The FortiGate Internet path was previously operational. A subsequent ARP failure
 
 **Planned enhancements:**
 
-- Explicit outbound firewall policy logging
 - Basic firewall management hardening
 - Additional security validation
 
 
 
 
-\### GNS3
+### GNS3
 
 
 
@@ -232,21 +250,21 @@ GNS3 provides the virtual networking environment used to integrate virtual serve
 
 The environment includes:
 
-\- Virtual Ethernet switching
+- Virtual Ethernet switching
 
-\- GNS3 Cloud interfaces for physical network bridging
+- GNS3 Cloud interfaces for physical network bridging
 
-\- FortiGate virtualization
+- FortiGate virtualization
 
-\- Windows Server virtualization
+- Windows Server virtualization
 
-\- Ubuntu Server virtualization
+- Ubuntu Server virtualization
 
-\- GNS3 NAT for upstream Internet connectivity
+- GNS3 NAT for upstream Internet connectivity
 
 
 
-\## Supporting Tools
+## Supporting Tools
 
 
 
@@ -271,4 +289,3 @@ The environment includes:
 | USB-to-Ethernet Adapter | Physical bridge between GNS3 virtual networks and the Cisco lab |
 
 | PowerShell | Windows administration, network configuration, and troubleshooting |
-

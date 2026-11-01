@@ -1,4 +1,4 @@
-# Project Milestones
+﻿# Project Milestones
 
 
 
@@ -515,9 +515,9 @@ External DNS resolution was validated using:
 ### Outstanding Items
 
 - The original direct UNC navigation restriction remains unexplained, although mapped-drive access and file modification are working.
-- Event ID 4625 was not observed; failure auditing was confirmed through policy configuration rather than event generation.
-- Legacy/OT isolation, additional FortiGate hardening, and network automation remain separate project tasks.
-
+- Windows Security Event ID 4625 was subsequently observed and validated, confirming failed-logon auditing behavior.
+- Troy Legacy/OT VLAN 30 isolation and FortiGate firewall policy testing were completed in later project phases and are documented separately.
+- Additional FortiGate management hardening, unresolved transit connectivity troubleshooting, and network automation remain future work.
 ### Result
 
 **Status: PASS — Cross-site SMB access, authentication auditing, DNS, and security configuration validation**
@@ -526,3 +526,120 @@ The enterprise now has documented evidence of centrally managed user identities,
 
 Supporting screenshots and detailed test results are recorded in [Network Validation](validation.md).
 
+---
+
+## Milestone 14 — Troy Legacy/OT VLAN 30 Isolation
+
+### Completed
+
+- Configured extended ACLs on TROY-SW1 to isolate the Legacy/OT network (`10.20.30.0/24`).
+- Applied `TROY-OT-IN` to restrict traffic originating from VLAN 30.
+- Applied `TROY-OT-OUT` to restrict routed traffic entering VLAN 30.
+- Established a default-deny approach for unauthorized routed communication.
+- Preserved local Layer 2 communication within the Legacy/OT VLAN.
+- Captured before-and-after connectivity evidence.
+- Verified ACL enforcement through controlled connectivity testing and deny counters.
+
+### Validation
+
+Before ACL deployment, the Legacy/OT test environment could communicate with the Mason server infrastructure.
+
+After deployment, controlled tests confirmed that unauthorized routed communication between the Legacy/OT network and other enterprise networks was blocked.
+
+ACL deny counters increased during testing, providing additional evidence that traffic matched the configured restrictions.
+
+### Validation Limitations
+
+- DHCP successfully assigned addresses to Troy VLAN 30 clients before ACL deployment.
+- DHCP functionality after ACL deployment has not been independently validated.
+- Local Layer 2 communication within VLAN 30 is not filtered by the routed ACLs.
+- The testing does not establish comprehensive protection against every possible network attack.
+
+### Result
+
+**Status: PASS — Bidirectional routed Legacy/OT isolation validated.**
+
+Supporting screenshots and test results are documented in [Network Validation](validation.md).
+
+---
+
+## Milestone 15 — FortiGate Firewall Policy Enforcement and Logging
+
+### Completed
+
+- Configured FortiGate firewall policies to control traffic crossing the enterprise security boundary.
+- Validated permitted traffic through controlled connectivity testing.
+- Validated denied traffic through controlled connectivity testing.
+- Inspected firewall policy hit counters to identify traffic matching configured policies.
+- Reviewed FortiGate traffic logs to verify visibility into firewall activity.
+- Captured firewall policy configurations, traffic tests, counters, and logging evidence.
+
+### Validation
+
+Controlled testing demonstrated that the configured FortiGate policies permitted authorized traffic and denied restricted traffic.
+
+Firewall policy counters provided supporting evidence of traffic matching the configured rules.
+
+Before-and-after screenshots showed changes in policy counters. These changes demonstrate traffic activity but do not independently prove that firewall configurations were modified between captures.
+
+FortiGate traffic logs provided additional visibility into policy enforcement.
+
+### Validation Limitations
+
+- The dedicated Mason-to-FortiGate transit network (`10.10.40.0/30`) subsequently experienced an unresolved ARP connectivity failure.
+- Earlier successful Internet connectivity tests remain valid historical evidence, but current end-to-end connectivity requires revalidation.
+- The separate FortiGate VMnet1 management connectivity investigation remains unresolved.
+- Firewall policy validation does not establish that every possible traffic scenario has been tested.
+
+### Result
+
+**Status: PASS — FortiGate firewall policy enforcement and logging validated for the tested traffic scenarios.**
+
+**Outstanding:** Revalidate the Mason-to-FortiGate transit connection and investigate the separate VMnet1 management connectivity issue.
+
+Supporting screenshots and test results are documented in [Network Validation](validation.md). Additional investigation details are recorded in [Troubleshooting](troubleshooting.md).
+
+---
+
+## Milestone 16 — Troy Switch Security Hardening
+
+### Completed
+
+- Configured port security on 12 TROY-SW1 access ports.
+- Set the maximum permitted MAC addresses to one per protected port.
+- Configured port security violation mode as `restrict`.
+- Enabled PortFast on designated access ports.
+- Configured BPDU Guard on designated access ports.
+- Enabled SSH version 2 for encrypted remote switch administration.
+- Disabled HTTP and HTTPS management services.
+- Captured switch configuration and operational verification evidence.
+
+### Validation
+
+Cisco IOS configuration and verification commands confirmed the implemented security controls.
+
+Port security settings were verified on the configured access ports, including the maximum MAC address limit and violation mode.
+
+PortFast and BPDU Guard configuration was inspected to confirm the intended access-port protections.
+
+SSH management configuration and operational status were verified.
+
+HTTP and HTTPS management services were confirmed disabled.
+
+### Validation Limitations
+
+The following behavioral tests were not independently completed:
+
+- Connecting an unauthorized device to trigger a port security violation.
+- Introducing a BPDU to verify BPDU Guard enforcement.
+- Attempting a Telnet connection to confirm rejection.
+
+These controls are configuration-validated but should not be described as behaviorally validated.
+
+### Result
+
+**Status: PASS — Troy switch security hardening configuration verified.**
+
+**Outstanding:** Optional behavioral enforcement testing.
+
+Supporting screenshots and command output are documented in [Network Validation](validation.md).

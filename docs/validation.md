@@ -1,4 +1,4 @@
-\# Network Validation
+﻿# Network Validation
 
 
 
@@ -10,11 +10,11 @@ Validation is performed throughout the build process rather than only after the 
 
 
 
-\## 1. Mason-Troy WAN Connectivity
+## 1. Mason-Troy WAN Connectivity
 
 
 
-\### Objective
+### Objective
 
 
 
@@ -22,19 +22,19 @@ Verify Layer 3 connectivity across the point-to-point WAN between Mason and Troy
 
 
 
-\### Network
+### Network
 
 
 
-\- MASON-R1: `10.255.0.1/30`
+- MASON-R1: `10.255.0.1/30`
 
-\- TROY-SW1: `10.255.0.2/30`
+- TROY-SW1: `10.255.0.2/30`
 
-\- WAN Network: `10.255.0.0/30`
+- WAN Network: `10.255.0.0/30`
 
 
 
-\### Result
+### Result
 
 
 
@@ -42,19 +42,16 @@ Bidirectional connectivity across the WAN was successfully verified.
 
 
 
-\*\*Status: PASS\*\*
+**Status: PASS**
 
 
 
-\---
+---
+## 2. OSPF Neighbor Adjacency
 
 
 
-\## 2. OSPF Neighbor Adjacency
-
-
-
-\### Objective
+### Objective
 
 
 
@@ -62,21 +59,21 @@ Verify that MASON-R1 and TROY-SW1 successfully establish an OSPF neighbor relati
 
 
 
-\### Configuration
+### Configuration
 
 
 
-\- OSPF Process: 1
+- OSPF Process: 1
 
-\- Area: 0
+- Area: 0
 
-\- MASON-R1 Router ID: `10.255.0.1`
+- MASON-R1 Router ID: `10.255.0.1`
 
-\- TROY-SW1 Router ID: `10.255.0.2`
+- TROY-SW1 Router ID: `10.255.0.2`
 
 
 
-\### Result
+### Result
 
 
 
@@ -84,15 +81,12 @@ A full OSPF adjacency was successfully established between MASON-R1 and TROY-SW1
 
 
 
-\*\*Status: PASS\*\*
+**Status: PASS**
 
 
 
-\---
-
-
-
-\## 3. OSPF Route Propagation
+---
+## 3. OSPF Route Propagation
 
 
 ### OSPF Adjacency Evidence
@@ -112,7 +106,7 @@ This validates OSPF neighbor establishment across the Mason–Troy routed WAN.
 
 
 
-\### Objective
+### Objective
 
 
 
@@ -120,7 +114,7 @@ Verify that both sites dynamically learn the remote site's networks.
 
 
 
-\### Mason Learning Troy
+### Mason Learning Troy
 
 
 
@@ -128,11 +122,11 @@ MASON-R1 successfully learned:
 
 
 
-\- `10.20.10.0/24`
+- `10.20.10.0/24`
 
-\- `10.20.20.0/24`
+- `10.20.20.0/24`
 
-\- `10.20.30.0/24`
+- `10.20.30.0/24`
 
 
 
@@ -140,7 +134,7 @@ Routes were learned through TROY-SW1 at `10.255.0.2`.
 
 
 
-\### Troy Learning Mason
+### Troy Learning Mason
 
 
 
@@ -148,11 +142,11 @@ TROY-SW1 successfully learned:
 
 
 
-\- `10.10.10.0/24`
+- `10.10.10.0/24`
 
-\- `10.10.20.0/24`
+- `10.10.20.0/24`
 
-\- `10.10.30.0/24`
+- `10.10.30.0/24`
 
 
 
@@ -160,7 +154,7 @@ Routes were learned through MASON-R1 at `10.255.0.1`.
 
 
 
-\### Result
+### Result
 
 
 
@@ -168,19 +162,16 @@ Bidirectional OSPF route propagation was successfully verified.
 
 
 
-\*\*Status: PASS\*\*
+**Status: PASS**
 
 
 
-\---
+---
+## 4. Mason Physical/Virtual Trunk
 
 
 
-\## 4. Mason Physical/Virtual Trunk
-
-
-
-\### Objective
+### Objective
 
 
 
@@ -188,7 +179,7 @@ Verify that the physical Mason network can carry VLAN traffic between GNS3 and M
 
 
 
-\### Configuration
+### Configuration
 
 
 
@@ -196,13 +187,13 @@ MASON-SW1 Fa0/5 is configured as an 802.1Q trunk carrying:
 
 
 
-\- VLAN 10
+- VLAN 10
 
-\- VLAN 20
+- VLAN 20
 
-\- VLAN 30
+- VLAN 30
 
-\- VLAN 999
+- VLAN 999
 
 
 
@@ -218,7 +209,7 @@ The trunk connects:
 
 
 
-\### Result
+### Result
 
 
 
@@ -226,19 +217,16 @@ The trunk entered the forwarding state and successfully transported VLAN 30 traf
 
 
 
-\*\*Status: PASS\*\*
+**Status: PASS**
 
 
 
-\---
+---
+## 5. Windows Server Gateway Connectivity
 
 
 
-\## 5. Windows Server Gateway Connectivity
-
-
-
-\### Objective
+### Objective
 
 
 
@@ -246,19 +234,19 @@ Verify that Windows Server 2025 can communicate through the physical/virtual net
 
 
 
-\### Configuration
+### Configuration
 
 
 
-\- Windows Server: `10.10.30.10/24`
+- Windows Server: `10.10.30.10/24`
 
-\- Default Gateway: `10.10.30.1`
+- Default Gateway: `10.10.30.1`
 
-\- VLAN: 30 — Servers
+- VLAN: 30 — Servers
 
 
 
-\### Result
+### Result
 
 
 
@@ -274,19 +262,16 @@ This validated the path:
 
 
 
-\*\*Status: PASS\*\*
+**Status: PASS**
 
 
 
-\---
+---
+## 6. Ubuntu Server Gateway Connectivity
 
 
 
-\## 6. Ubuntu Server Gateway Connectivity
-
-
-
-\### Objective
+### Objective
 
 
 
@@ -294,19 +279,19 @@ Verify that Ubuntu Server can communicate with its default gateway through the s
 
 
 
-\### Configuration
+### Configuration
 
 
 
-\- Ubuntu Server: `10.10.30.20/24`
+- Ubuntu Server: `10.10.30.20/24`
 
-\- Default Gateway: `10.10.30.1`
+- Default Gateway: `10.10.30.1`
 
-\- VLAN: 30 — Servers
+- VLAN: 30 — Servers
 
 
 
-\### Result
+### Result
 
 
 
@@ -314,19 +299,16 @@ Ubuntu Server successfully reached `10.10.30.1`.
 
 
 
-\*\*Status: PASS\*\*
+**Status: PASS**
 
 
 
-\---
+---
+## 7. Server-to-Server Communication
 
 
 
-\## 7. Server-to-Server Communication
-
-
-
-\### Objective
+### Objective
 
 
 
@@ -334,7 +316,7 @@ Verify bidirectional communication between the Windows and Ubuntu servers.
 
 
 
-\### Tests
+### Tests
 
 
 
@@ -354,7 +336,7 @@ Ubuntu Server:
 
 
 
-\### Result
+### Result
 
 
 
@@ -362,19 +344,16 @@ After configuring the appropriate Windows Firewall rule, bidirectional communica
 
 
 
-\*\*Status: PASS\*\*
+**Status: PASS**
 
 
 
-\---
+---
+## 8. Active Directory Domain Services
 
 
 
-\## 8. Active Directory Domain Services
-
-
-
-\### Objective
+### Objective
 
 
 
@@ -382,25 +361,25 @@ Verify successful deployment of the project's Active Directory environment.
 
 
 
-\### Configuration
+### Configuration
 
 
 
-\- Domain: `masonmfg.internal`
+- Domain: `masonmfg.internal`
 
-\- NetBIOS Name: `MASONMFG`
+- NetBIOS Name: `MASONMFG`
 
-\- Domain Controller: Windows Server 2025
+- Domain Controller: Windows Server 2025
 
-\- Domain Controller Address: `10.10.30.10`
+- Domain Controller Address: `10.10.30.10`
 
-\- DNS Server: Enabled
+- DNS Server: Enabled
 
-\- Global Catalog: Enabled
+- Global Catalog: Enabled
 
 
 
-\### Result
+### Result
 
 
 
@@ -412,19 +391,16 @@ Active Directory administrative tools became available after promotion and reboo
 
 
 
-\*\*Status: PASS\*\*
+**Status: PASS**
 
 
 
-\---
+---
+## 9. Active Directory DNS
 
 
 
-\## 9. Active Directory DNS
-
-
-
-\### Objective
+### Objective
 
 
 
@@ -432,7 +408,7 @@ Verify that DNS contains the records required for Active Directory service disco
 
 
 
-\### Verified DNS Structure
+### Verified DNS Structure
 
 
 
@@ -440,9 +416,9 @@ The following Active Directory-integrated forward lookup zones were created:
 
 
 
-\- `\_msdcs.masonmfg.internal`
+- `_msdcs.masonmfg.internal`
 
-\- `masonmfg.internal`
+- `masonmfg.internal`
 
 
 
@@ -450,17 +426,17 @@ Service records were verified for:
 
 
 
-\- Kerberos
+- Kerberos
 
-\- LDAP
+- LDAP
 
-\- kpasswd
+- kpasswd
 
-\- Global Catalog
+- Global Catalog
 
 
 
-\### Result
+### Result
 
 
 
@@ -468,19 +444,16 @@ Active Directory DNS records were successfully created and verified.
 
 
 
-\*\*Status: PASS\*\*
+**Status: PASS**
 
 
 
-\---
+---
+## 10. Reverse DNS
 
 
 
-\## 10. Reverse DNS
-
-
-
-\### Objective
+### Objective
 
 
 
@@ -488,7 +461,7 @@ Verify reverse DNS functionality for the Mason server network.
 
 
 
-\### Configuration
+### Configuration
 
 
 
@@ -516,7 +489,7 @@ A PTR record was created for:
 
 
 
-\### Validation
+### Validation
 
 
 
@@ -532,7 +505,7 @@ The query successfully returned the domain controller's hostname and address.
 
 
 
-\### Result
+### Result
 
 
 
@@ -540,12 +513,11 @@ Reverse DNS resolution is operational.
 
 
 
-\*\*Status: PASS\*\*
+**Status: PASS**
 
 
 
-\---
-
+---
 ## 11. Windows Security Auditing
 
 ### Objective
@@ -1176,43 +1148,274 @@ The Mason DNS server successfully maintained internal enterprise DNS records and
 **Status: PASS**
 
 
+## 26. Troy Legacy/OT VLAN 30 Isolation
+
+### Objective
+
+Verify that the Troy Legacy/OT network (`10.20.30.0/24`) is isolated from other routed enterprise networks using extended access control lists (ACLs), while preserving communication between devices within the local VLAN.
+
+### Network Configuration
+
+- Site: Troy
+- VLAN: 30 — Legacy/OT
+- Network: `10.20.30.0/24`
+- Default gateway: `10.20.30.1`
+- Layer 3 interface: `TROY-SW1 Vlan30`
+
+Two extended ACLs were configured to enforce bidirectional routed isolation:
+
+- `TROY-OT-IN` — Restricts traffic originating from the Legacy/OT VLAN.
+- `TROY-OT-OUT` — Restricts routed traffic entering the Legacy/OT VLAN.
+
+### Pre-ACL Validation
+
+Before applying the isolation controls, connectivity tests demonstrated that the Legacy/OT test endpoint could reach its default gateway and Mason infrastructure across the routed WAN.
+
+These tests established a baseline for comparison after ACL enforcement.
+
+### Post-ACL Validation
+
+After applying the ACLs, additional connectivity tests confirmed that routed communication between the Legacy/OT network and other enterprise networks was restricted.
+
+Validation included:
+
+- Testing outbound communication from the Legacy/OT VLAN.
+- Testing inbound communication toward the Legacy/OT VLAN.
+- Inspecting ACL deny counters.
+- Confirming that denied traffic incremented the appropriate ACL counters.
+
+Communication between devices within the same Legacy/OT VLAN remained possible because local Layer 2 switching does not require routing through the VLAN interface.
+
+### Evidence
+
+**ACL configuration:**
+
+![Troy VLAN 30 Bidirectional ACL Configuration](../screenshots/security/Troy-VLAN30-bidirectional-acl-config.png)
+
+**Pre-ACL connectivity:**
+
+![Troy VLAN 30 Pre-ACL Connectivity](../screenshots/security/Troy-vlan30-preacl-connectivity.png)
+
+**Post-ACL connectivity:**
+
+![Troy VLAN 30 Post-ACL Connectivity](../screenshots/security/Troy-vlan-30-postacl-connectivity.png)
+
+**Inbound isolation validation:**
+
+![Mason to Troy Legacy/OT Traffic Blocked](../screenshots/security/troy-vlan30-mason-to-ot-blocked.png)
+
+**ACL enforcement and deny counters:**
+
+![Troy VLAN 30 ACL Enforcement](../screenshots/security/troy-vlan30-acl-enforcement-validation.png)
+
+![Troy VLAN 30 ACL Deny Counters](../screenshots/security/troy-valn30-acl-deny-counter-validation.png)
+
+### Validation Limitations
+
+DHCP functionality was validated on Troy VLAN 30 before the isolation ACLs were applied. DHCP operation after ACL enforcement has not been independently verified.
+
+The ACLs enforce routed network isolation; they do not prevent direct Layer 2 communication between devices within the same VLAN.
+
+### Result
+
+**Status: PASS — Bidirectional routed Legacy/OT isolation validated.**
+
+Extended ACLs successfully restricted routed communication into and out of Troy VLAN 30. Connectivity testing and incrementing deny counters provided evidence of enforcement.
+
+
+## 27. FortiGate Firewall Policy Validation
+
+### Objective
+
+Verify that the FortiGate firewall enforces configured traffic policies, permits authorized outbound services, blocks unauthorized traffic, and records network activity.
+
+### Configuration
+
+The FortiGate firewall provides security controls at the enterprise Internet edge.
+
+Firewall policies were configured to distinguish workstation and server traffic.
+
+The configuration includes:
+
+- Workstation Internet access policies.
+- Server Internet access policies.
+- Service-based traffic restrictions.
+- Network Address Translation (NAT).
+- Firewall traffic logging.
+- Implicit deny behavior for traffic without a matching allow policy.
+
+### Validation
+
+Controlled connectivity tests were performed to evaluate firewall policy behavior.
+
+The collected evidence demonstrates:
+
+- Successful HTTPS requests through an authorized firewall policy.
+- Successful NTP traffic through the firewall.
+- Allowed and denied traffic during workstation testing.
+- Allowed and denied traffic during server testing.
+- Firewall policy traffic counters increasing during network activity.
+- Firewall traffic logs recording permitted connections.
+
+The before-and-after traffic screenshots demonstrate increasing policy activity. They do not independently establish that a firewall configuration change occurred.
+
+### Evidence
+
+**Firewall policy configuration:**
+
+![FortiGate Firewall Policies](../screenshots/firewall/fortigae-firewall-final-policy-config.png)
+
+**Workstation allow/deny validation:**
+
+![Workstation Firewall Validation](../screenshots/firewall/foritgate-workstation-allow-deny-validation.png)
+
+**Server allow/deny validation:**
+
+![Server Firewall Validation](../screenshots/firewall/firewall-fortigate-dhcp-server-allow-deny-validation.png)
+
+**HTTPS traffic validation:**
+
+![HTTPS Firewall Validation](../screenshots/firewall/firewall-allow-https-get-request.png)
+
+**NTP traffic validation:**
+
+![NTP Firewall Validation](../screenshots/firewall/successful-ntp-session-firewall.png)
+
+**Firewall logging:**
+
+![FortiGate Traffic Logging](../screenshots/firewall/firewall-logging.png)
+
+**Before-and-after policy traffic counters:**
+
+![Firewall Traffic Before Testing](../screenshots/firewall/before-traffic-data.png)
+
+![Firewall Traffic After Testing](../screenshots/firewall/after-traffic.png)
+
+### Validation Limitations
+
+Traffic counters confirm that packets matched firewall policies but do not independently demonstrate that unauthorized traffic was blocked.
+
+The allow/deny tests provide separate behavioral evidence of policy enforcement.
+
+The Mason-to-FortiGate transit network (10.10.40.0/30) subsequently experienced an unresolved ARP connectivity failure. Earlier successful firewall policy and Internet connectivity tests remain valid historical evidence, but current end-to-end Internet connectivity requires revalidation. The separate FortiGate VMnet1 management connectivity issue also remains unresolved.
+
+### Result
+
+**Status: PASS — FortiGate firewall policy enforcement and traffic logging validated.**
+
+The FortiGate successfully processed authorized traffic, enforced service-based restrictions during controlled testing, and recorded network activity.
+
+
+## 28. Troy Switch Security Hardening
+
+### Objective
+
+Verify the implementation of Layer 2 security controls and secure management services on the Troy Cisco Catalyst switch.
+
+### Port Security Configuration
+
+Port security was configured on 12 access ports of TROY-SW1.
+
+The verified configuration included:
+
+- Maximum of one learned MAC address per protected port.
+- Port-security violation mode set to `restrict`.
+- Port security enabled on the selected access interfaces.
+- Configuration saved to startup configuration.
+
+The verification output showed zero recorded port-security violations at the time of inspection.
+
+**Evidence:**
+
+![Troy Switch Port Security Configuration](../screenshots/security/switch-hardening/troy-sw1-port-secuity-final%20-config.png)
+
+### PortFast and BPDU Guard
+
+PortFast and BPDU Guard were configured on selected access interfaces.
+
+These controls support faster endpoint connectivity while helping protect access ports against unexpected spanning-tree participation.
+
+Configuration inspection confirmed that the relevant settings were present.
+
+**Evidence:**
+
+![Troy Switch PortFast and BPDU Guard](../screenshots/security/switch-hardening/troy-switch-portfast-bpduguard-validation.png)
+
+### Secure Management
+
+SSH version 2 was verified as enabled on TROY-SW1.
+
+Management testing demonstrated:
+
+- An SSH login prompt.
+- A configured login warning banner.
+- Successful authenticated access to the switch.
+- An active remote management session.
+- HTTP management disabled.
+- HTTPS management disabled.
+
+**Evidence:**
+
+![Troy Switch SSH Login and Banner](../screenshots/security/switch-hardening/troy-switch-ssh-login-banner-validation.png)
+
+![Troy Switch SSH Management Configuration](../screenshots/security/switch-hardening/troy-switch-ssh-management-validation.png)
+
+### Validation Limitations
+
+The collected evidence confirms the presence of port-security, PortFast, and BPDU Guard configuration.
+
+However:
+
+- An unauthorized MAC address was not introduced to test port-security violation behavior.
+- BPDU Guard shutdown behavior was not tested using an unexpected BPDU.
+- Telnet was not independently verified as disabled.
+
+These controls are therefore configuration-validated rather than fully behaviorally tested.
+
+### Result
+
+**Status: PASS — Switch security configuration verified.**
+
+Port security, PortFast, BPDU Guard, SSHv2, and disabled HTTP/HTTPS management were verified on TROY-SW1.
+
+Additional behavioral testing would be required to establish full enforcement of every configured security control.
+
+
 ---
 
 
 
 ## Validation Still Required
 
+The following tasks remain outstanding or require additional testing:
 
-- Investigate the earlier File Explorer restriction when accessing `CompanyShare` through direct UNC navigation. Cross-site SMB authentication, mapped-drive access, and file modification have been successfully validated in Sections 20–22.
+- Investigate the earlier File Explorer restriction when accessing `CompanyShare` through direct UNC navigation. Cross-site SMB authentication and file modification have already been validated.
+- Verify DHCP operation on Troy VLAN 30 after applying the Legacy/OT isolation ACLs.
+- Perform unauthorized MAC address testing to validate port-security violation behavior.
+- Perform BPDU Guard enforcement testing, if a safe test environment is available.
+- Independently verify that Telnet management access is disabled on TROY-SW1.
+- Validate authorized management access across the intended network boundaries.
+- Implement centralized logging and monitoring beyond the existing Windows Security and FortiGate logs.
+- Develop and validate Python/Netmiko automation.
+- Validate automated configuration backup functionality.
+- Perform Wireshark protocol analysis.
+- Complete final end-to-end enterprise connectivity testing.
+- Complete final end-to-end security testing.
 
-- Perform additional FortiGate firewall policy validation
+### Completed Security Milestones
 
-- Integrate the legacy Windows XP/manufacturing endpoint
+The following security features have been implemented and documented:
 
-- Implement Legacy/OT VLAN isolation using extended ACLs
-
-- Validate Legacy/OT isolation with before-and-after connectivity testing
-
-- Validate authorized management access
-
-- Implement and validate additional switch security and hardening controls
-
-- Implement centralized logging and monitoring
-
-- Develop and validate Python/Netmiko automation
-
-- Validate automated configuration backup functionality
-
-- Perform Wireshark protocol analysis
-
-- Complete final end-to-end enterprise connectivity testing
-
-- Complete final end-to-end security testing
+- **Legacy/OT isolation:** Bidirectional routed ACL enforcement validated through connectivity testing and deny counters.
+- **FortiGate firewall:** Authorized traffic, denied traffic, and firewall logging validated.
+- **Switch hardening:** Port security, PortFast, BPDU Guard, SSHv2, and disabled HTTP/HTTPS management verified through configuration inspection.
+- **Windows security auditing:** Advanced Audit Policy and multiple Security event categories validated.
+- **Workstation Group Policy:** Troy workstation restrictions and shared security baseline validated.
 
 
 
 
-\## Validation Approach
+## Validation Approach
 
 
 
@@ -1220,9 +1423,8 @@ Each major project phase follows the same general process:
 
 
 
-\*\*Build → Verify Configuration → Test Connectivity or Service → Troubleshoot if Necessary → Retest → Document Results\*\*
+**Build → Verify Configuration → Test Connectivity or Service → Troubleshoot if Necessary → Retest → Document Results**
 
 
 
 A feature is not considered complete solely because its configuration exists. Expected behavior must also be demonstrated through testing.
-

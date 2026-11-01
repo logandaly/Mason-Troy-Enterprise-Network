@@ -1,4 +1,4 @@
-\# Troubleshooting
+﻿# Troubleshooting
 
 
 
@@ -6,11 +6,11 @@ This document records significant technical problems encountered during the impl
 
 
 
-\## Case 1 — GNS3 Virtual Servers Unable to Reach Physical Network
+## Case 1 — GNS3 Virtual Servers Unable to Reach Physical Network
 
 
 
-\### Problem
+### Problem
 
 
 
@@ -18,21 +18,21 @@ Virtual servers connected through GNS3 were unable to successfully communicate w
 
 
 
-\### Symptoms
+### Symptoms
 
 
 
-\- Physical Cisco interfaces and trunks appeared operational.
+- Physical Cisco interfaces and trunks appeared operational.
 
-\- The GNS3 virtual switch and Cloud connection were configured.
+- The GNS3 virtual switch and Cloud connection were configured.
 
-\- The Windows Server could not successfully reach its default gateway at `10.10.30.1`.
+- The Windows Server could not successfully reach its default gateway at `10.10.30.1`.
 
-\- Connectivity failed despite the expected VLAN 30 path being configured.
+- Connectivity failed despite the expected VLAN 30 path being configured.
 
 
 
-\### Investigation
+### Investigation
 
 
 
@@ -40,15 +40,15 @@ The physical and virtual Layer 2 path was checked first, including:
 
 
 
-\- GNS3 virtual switch configuration
+- GNS3 virtual switch configuration
 
-\- 802.1Q trunk configuration
+- 802.1Q trunk configuration
 
-\- MASON-SW1 Fa0/5
+- MASON-SW1 Fa0/5
 
-\- VLAN 30 availability
+- VLAN 30 availability
 
-\- Physical USB-to-Ethernet connectivity
+- Physical USB-to-Ethernet connectivity
 
 
 
@@ -56,7 +56,7 @@ The host's USB-to-Ethernet adapter was then inspected and found to still have an
 
 
 
-\### Root Cause
+### Root Cause
 
 
 
@@ -64,7 +64,7 @@ The USB-to-Ethernet adapter retained an outdated Layer 3 configuration while bei
 
 
 
-\### Resolution
+### Resolution
 
 
 
@@ -72,7 +72,7 @@ The stale `10.20.30.10` address was removed from the USB-to-Ethernet adapter. Th
 
 
 
-\### Validation
+### Validation
 
 
 
@@ -88,7 +88,7 @@ This confirmed successful communication across the complete path:
 
 
 
-\### Lesson Learned
+### Lesson Learned
 
 
 
@@ -96,11 +96,11 @@ When repurposing a physical network interface for Layer 2 bridging, old Layer 3 
 
 
 
-\## Case 2 — Asymmetric Communication Between Windows and Ubuntu Servers
+## Case 2 — Asymmetric Communication Between Windows and Ubuntu Servers
 
 
 
-\### Problem
+### Problem
 
 
 
@@ -108,21 +108,21 @@ Ubuntu Server was unable to successfully ping Windows Server even though both sy
 
 
 
-\### Symptoms
+### Symptoms
 
 
 
-\- Windows Server could successfully ping Ubuntu Server.
+- Windows Server could successfully ping Ubuntu Server.
 
-\- Ubuntu Server could not successfully ping Windows Server.
+- Ubuntu Server could not successfully ping Windows Server.
 
-\- Both servers could reach the VLAN 30 default gateway at `10.10.30.1`.
+- Both servers could reach the VLAN 30 default gateway at `10.10.30.1`.
 
-\- Both systems were configured within the `10.10.30.0/24` subnet.
+- Both systems were configured within the `10.10.30.0/24` subnet.
 
 
 
-\### Investigation
+### Investigation
 
 
 
@@ -138,7 +138,7 @@ Windows Firewall was investigated as a possible source of the blocked inbound tr
 
 
 
-\### Root Cause
+### Root Cause
 
 
 
@@ -146,11 +146,11 @@ Windows Firewall was blocking inbound ICMP echo requests from Ubuntu Server.
 
 
 
-\### Resolution
+### Resolution
 
 
 
-The built-in Windows \*\*File and Printer Sharing\*\* firewall rule group was enabled rather than disabling Windows Firewall entirely.
+The built-in Windows **File and Printer Sharing** firewall rule group was enabled rather than disabling Windows Firewall entirely.
 
 
 
@@ -158,7 +158,7 @@ This allowed the required inbound ICMP traffic while preserving host firewall pr
 
 
 
-\### Validation
+### Validation
 
 
 
@@ -166,11 +166,11 @@ After enabling the appropriate firewall rules:
 
 
 
-\- Windows Server successfully pinged Ubuntu Server.
+- Windows Server successfully pinged Ubuntu Server.
 
-\- Ubuntu Server successfully pinged Windows Server.
+- Ubuntu Server successfully pinged Windows Server.
 
-\- Both servers successfully reached `10.10.30.1`.
+- Both servers successfully reached `10.10.30.1`.
 
 
 
@@ -178,7 +178,7 @@ Bidirectional communication between the two Mason servers was confirmed.
 
 
 
-\### Lesson Learned
+### Lesson Learned
 
 
 
@@ -186,15 +186,12 @@ Successful one-way communication is an important troubleshooting clue. When one 
 
 
 
-\---
+---
+## Case 3 — OSPF Unavailable on Original Troy Switch
 
 
 
-\## Case 3 — OSPF Unavailable on Original Troy Switch
-
-
-
-\### Problem
+### Problem
 
 
 
@@ -202,7 +199,7 @@ The Catalyst 3560 originally assigned to Troy needed to perform Layer 3 routing 
 
 
 
-\### Symptoms
+### Symptoms
 
 
 
@@ -214,7 +211,7 @@ However, attempting to create an OSPF process resulted in an error indicating th
 
 
 
-\### Investigation
+### Investigation
 
 
 
@@ -234,7 +231,7 @@ An IOS upgrade was considered, including backing up the existing image and poten
 
 
 
-\### Root Cause
+### Root Cause
 
 
 
@@ -246,7 +243,7 @@ The presence of OSPF-related command options in the CLI did not guarantee that t
 
 
 
-\### Resolution
+### Resolution
 
 
 
@@ -262,7 +259,7 @@ The IP Base switch became `MASON-SW1` and was configured as a Layer 2 access swi
 
 
 
-\### Validation
+### Validation
 
 
 
@@ -270,19 +267,19 @@ After the role change:
 
 
 
-\- TROY-SW1 successfully enabled IP routing.
+- TROY-SW1 successfully enabled IP routing.
 
-\- OSPF process 1 was successfully configured.
+- OSPF process 1 was successfully configured.
 
-\- TROY-SW1 formed a full OSPF adjacency with MASON-R1.
+- TROY-SW1 formed a full OSPF adjacency with MASON-R1.
 
-\- Mason and Troy routes were successfully exchanged.
+- Mason and Troy routes were successfully exchanged.
 
-\- Bidirectional communication across the WAN was validated.
+- Bidirectional communication across the WAN was validated.
 
 
 
-\### Lesson Learned
+### Lesson Learned
 
 
 
@@ -290,15 +287,12 @@ Hardware and software capabilities should be verified before changing network ar
 
 
 
-\---
+---
+## Case 4 — GNS3 Packet Capture Library Error
 
 
 
-\## Case 4 — GNS3 Packet Capture Library Error
-
-
-
-\### Problem
+### Problem
 
 
 
@@ -306,7 +300,7 @@ The GNS3 Ethernet switch reported that `wpcap.dll` could not be found, preventin
 
 
 
-\### Symptoms
+### Symptoms
 
 
 
@@ -318,7 +312,7 @@ Npcap was already installed, and the DLL existed within the Npcap installation d
 
 
 
-\### Investigation
+### Investigation
 
 
 
@@ -334,7 +328,7 @@ Rather than manually copying DLL files into Windows system directories, the offi
 
 
 
-\### Root Cause
+### Root Cause
 
 
 
@@ -342,7 +336,7 @@ Npcap had not been installed with the WinPcap API compatibility option required 
 
 
 
-\### Resolution
+### Resolution
 
 
 
@@ -350,7 +344,7 @@ Npcap was reinstalled using the official installer with:
 
 
 
-\*\*Install Npcap in WinPcap API-compatible Mode\*\*
+**Install Npcap in WinPcap API-compatible Mode**
 
 
 
@@ -362,7 +356,7 @@ Manual DLL copying was avoided.
 
 
 
-\### Validation
+### Validation
 
 
 
@@ -370,7 +364,7 @@ After reinstalling Npcap with compatibility mode enabled, the environment was ab
 
 
 
-\### Lesson Learned
+### Lesson Learned
 
 
 
@@ -378,8 +372,7 @@ When troubleshooting software dependencies, reinstalling or correcting the suppo
 
 
 
-\---
-
+---
 ## Case 5 — Troy Client Unable to Reach the Internet
 
 ### Problem
@@ -1076,10 +1069,139 @@ A successful alternative access method can validate service functionality withou
 
 
 
+## Case 15 — FortiGate VMnet1 Management Connectivity Investigation
+
+### Problem
+
+During FortiGate management connectivity testing, communication between the Windows host and the FortiGate virtual networking environment was unsuccessful.
+
+The investigation focused on VMware's VMnet1 host-only network, FortiGate interface configuration, ARP resolution, and ICMP traffic.
+
+### Symptoms
+
+- Windows ICMP tests to `192.168.119.10` repeatedly timed out.
+- FortiGate packet captures showed ICMP echo requests without corresponding echo replies.
+- A manually configured Windows ARP neighbor entry did not restore connectivity.
+- The available tests did not establish successful bidirectional communication.
+
+### Investigation
+
+**1. VMware Virtual Network Configuration**
+
+VMware Virtual Network Editor confirmed:
+
+- Network: `VMnet1`
+- Connection type: Host-only
+- Subnet: `192.168.119.0/24`
+- Host connection: Connected
+- DHCP: Enabled
+
+VMnet8 was separately configured as a NAT network using `192.168.80.0/24`.
+
+![VMnet1 Network Configuration](../screenshots/troubleshooting/fortigate-vmnet1/01-VMnet1-Network-Configuration.jpeg)
+
+**2. FortiGate Management Interface**
+
+FortiGate `port1` was configured with:
+
+- IP address: `192.168.119.20/24`
+- Administrative access: Ping, HTTPS, SSH, and HTTP
+- VDOM: `root`
+
+The configured interface address belonged to the same subnet as VMnet1.
+
+However, matching subnet configurations alone do not establish successful connectivity.
+
+![FortiGate Port1 Configuration](../screenshots/troubleshooting/fortigate-vmnet1/02-FortiGate-Port1-Configuration.jpeg)
+
+**3. ICMP Packet Capture**
+
+FortiGate's packet sniffer captured ICMP echo requests involving the VMnet1 network.
+
+One capture showed requests from:
+
+`192.168.119.20 → 192.168.119.1`
+
+Another showed requests from:
+
+`192.168.119.1 → 192.168.119.10`
+
+No corresponding echo replies appeared in the displayed captures.
+
+The absence of replies demonstrated unsuccessful ICMP communication during these tests but did not independently identify the component responsible.
+
+![FortiGate ICMP Sniffer](../screenshots/troubleshooting/fortigate-vmnet1/03-FortiGate-ICMP-Sniffer.jpeg)
+
+**4. ARP Table Inspection**
+
+FortiGate's ARP table contained an entry for:
+
+`192.168.119.1` on `port1`
+
+This demonstrated that FortiGate had learned a Layer 2 address for that destination.
+
+However, successful ARP resolution did not establish successful ICMP communication.
+
+![FortiGate ARP Table](../screenshots/troubleshooting/fortigate-vmnet1/04-FortiGate-ARP-Table.jpeg)
+
+**5. Windows Connectivity Testing**
+
+Windows identified VMware Network Adapter VMnet1 as interface 14.
+
+A static neighbor entry was manually added for `192.168.119.10`.
+
+Subsequent ICMP testing produced:
+
+- Packets sent: 4
+- Packets received: 0
+- Packet loss: 100%
+
+The static ARP entry did not restore connectivity.
+
+An important limitation is that the tested destination, `192.168.119.10`, differed from the FortiGate `port1` address of `192.168.119.20` shown in the configuration evidence.
+
+The screenshots do not establish whether `192.168.119.10` was assigned to another interface or device during testing.
+
+![Windows VMnet1 Ping Failure](../screenshots/troubleshooting/fortigate-vmnet1/05-Windows-Ping-Failure.jpeg)
+
+### Findings
+
+The investigation confirmed that VMware VMnet1 and FortiGate port1 were configured within the same IPv4 subnet.
+
+FortiGate also maintained an ARP entry for the VMnet1 host address.
+
+However, the captured ICMP requests did not produce visible replies, and Windows connectivity testing remained unsuccessful.
+
+The available evidence does not establish whether the failure originated from VMware virtual networking, GNS3 connectivity, Windows networking, FortiGate configuration, or another component.
+
+A separate FortiGate filesystem consistency warning was observed during the investigation, but no causal relationship to the network issue was established.
+
+### Root Cause
+
+**Not determined.**
+
+The screenshots demonstrate unsuccessful communication but do not provide sufficient evidence to identify a definitive root cause.
+
+### Resolution Status
+
+**Unresolved — further validation required.**
+
+No permanent corrective action or successful restoration of VMnet1 management connectivity was demonstrated in the collected evidence.
+
+### Recommended Follow-Up
+
+- Confirm the current IP address and operational status of FortiGate port1.
+- Verify which device, if any, uses `192.168.119.10`.
+- Confirm the GNS3 and VMware virtual interface connections.
+- Test connectivity using the verified FortiGate management address.
+- Compare ARP and ICMP observations from both sides of the connection.
+- Record bidirectional connectivity results and supporting evidence after further troubleshooting.
 
 
 
-\## Troubleshooting Methodology
+
+
+## Troubleshooting Methodology
 
 
 
@@ -1087,25 +1209,25 @@ The project uses a structured troubleshooting process when connectivity or servi
 
 
 
-1\. Identify the symptoms and determine the expected behavior.
+1. Identify the symptoms and determine the expected behavior.
 
-2\. Verify physical connectivity and interface state.
+2. Verify physical connectivity and interface state.
 
-3\. Verify VLAN membership and trunk configuration.
+3. Verify VLAN membership and trunk configuration.
 
-4\. Verify IP addressing and default gateways.
+4. Verify IP addressing and default gateways.
 
-5\. Verify routing and routing protocol operation.
+5. Verify routing and routing protocol operation.
 
-6\. Test connectivity incrementally across the traffic path.
+6. Test connectivity incrementally across the traffic path.
 
-7\. Investigate host firewalls and application services when network connectivity is otherwise functional.
+7. Investigate host firewalls and application services when network connectivity is otherwise functional.
 
-8\. Make one controlled change at a time.
+8. Make one controlled change at a time.
 
-9\. Retest after each significant change.
+9. Retest after each significant change.
 
-10\. Document the root cause, resolution, and validation results.
+10. Document the root cause, resolution, and validation results.
 
 
 
