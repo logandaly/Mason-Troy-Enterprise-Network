@@ -1381,6 +1381,68 @@ Port security, PortFast, BPDU Guard, SSHv2, and disabled HTTP/HTTPS management w
 Additional behavioral testing would be required to establish full enforcement of every configured security control.
 
 
+## Cisco Management Hardening and Python Automation Validation — November 6, 2026
+
+### MASON-SW1 Security Hardening
+
+MASON-SW1 was validated through configuration inspection and successful management authentication.
+
+Verified controls include SSHv2, local administrator authentication, console authentication, an enable secret, five-minute inactivity timeouts, restricted SSH VTY access, port security, PortFast, BPDU Guard, VLAN assignments, 802.1Q trunk configuration, disabled DTP negotiation, and disabled HTTP/HTTPS management.
+
+Console and SSH authentication were successfully tested from the management workstation. Port-security and BPDU Guard enforcement testing remains outstanding.
+
+**Evidence:**
+
+![Mason Switch SSH Management and Port Security](../screenshots/security/switch-hardening/Mason-SW1-SSH-Management-and-Port-security-Validation.png)
+
+![Mason Switch VLAN Trunk and HTTP Security](../screenshots/security/switch-hardening/Mason-SW1-Vlan-Trunk-and-HTTP-security-validation.png)
+
+### MASON-R1 Security Hardening
+
+MASON-R1 management security was validated through configuration inspection and successful SSH authentication.
+
+Verified controls include SSHv2, local authentication, restricted VTY access, management source ACLs, an enable secret, login auditing, and buffered logging.
+
+A successful SSH login event for `mason-admin` from `10.10.10.50` was recorded, confirming successful-login auditing behavior.
+
+OSPF passive-interface configuration was also verified. The intersite GigabitEthernet0/1 interface remained active, and the OSPF adjacency with TROY-SW1 reached FULL state.
+
+Legacy SSH algorithms remain a documented security limitation. Unauthorized connection rejection has not yet been independently tested.
+
+**Evidence:**
+
+![Mason Router SSH Management Security](../screenshots/security/Mason-R1-SSH-Management-Security-Validation.png)
+
+![Mason Router Login Auditing](../screenshots/security/Mason-R1-login-Auditing-and-Buffered-logging-Validation.png)
+
+![Mason Router OSPF Hardening and Adjacency](../screenshots/routing/Mason-R1-OSPF-Hardening-and-Adjacency-Validation.png)
+
+### Python Network Monitoring Automation
+
+A read-only Python automation script using Netmiko was implemented and successfully tested against all three physical Cisco devices.
+
+| Device | SSH Authentication | Commands Collected |
+|---|---|---|
+| MASON-R1 | Successful | 9/9 |
+| MASON-SW1 | Successful | 9/9 |
+| TROY-SW1 | Successful | 12/12 |
+| **Total** | **3/3 successful** | **30/30** |
+
+All commands returned a `collected` status in the generated JSON summary.
+
+The script demonstrated authenticated remote management, device-specific command execution, timestamped evidence collection, and structured JSON reporting.
+
+This validates the monitoring automation workflow, not the operational health of every network component.
+
+**Implementation:** [Python Network Monitoring](../automation/network-monitoring/README.md)
+
+**Evidence:**
+
+![Python Network Monitoring Validation](../screenshots/security/Mason-Troy-Python-Network-Monitoring-30-Commands-Validation.png)
+
+**Status: PASS — Three-device Python network monitoring and evidence collection validated.**
+
+
 ---
 
 
@@ -1394,9 +1456,8 @@ The following tasks remain outstanding or require additional testing:
 - Perform unauthorized MAC address testing to validate port-security violation behavior.
 - Perform BPDU Guard enforcement testing, if a safe test environment is available.
 - Independently verify that Telnet management access is disabled on TROY-SW1.
-- Validate authorized management access across the intended network boundaries.
+- Complete management access security testing. Successful SSH authentication to all three Cisco devices has been validated; unauthorized access rejection and source-based ACL enforcement remain pending.
 - Implement centralized logging and monitoring beyond the existing Windows Security and FortiGate logs.
-- Develop and validate Python/Netmiko automation.
 - Validate automated configuration backup functionality.
 - Perform Wireshark protocol analysis.
 - Complete final end-to-end enterprise connectivity testing.

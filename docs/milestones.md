@@ -614,6 +614,69 @@ Supporting screenshots and test results are documented in [Network Validation](v
 - Disabled HTTP and HTTPS management services.
 - Captured switch configuration and operational verification evidence.
 
+---
+
+## Milestone 17 — Cisco Infrastructure Hardening and Python Network Automation
+
+**Date:** November 6, 2026
+
+### Completed
+
+- Completed additional security hardening on MASON-R1 and MASON-SW1.
+- Configured and verified local console authentication and an enable secret on MASON-SW1.
+- Verified SSHv2 and restricted management access on the Mason devices.
+- Configured OSPF passive interfaces on MASON-R1 and TROY-SW1 while preserving the intersite neighbor relationship.
+- Enabled and verified login auditing and buffered logging on MASON-R1.
+- Successfully authenticated to all three physical Cisco devices using SSH from the management workstation.
+- Developed and tested a read-only Python network monitoring script using Netmiko.
+- Implemented device-specific monitoring commands and timestamped evidence collection.
+- Generated JSON monitoring summaries for automated validation.
+
+### Python Automation Validation
+
+The monitoring script successfully connected to all three Cisco devices.
+
+| Device | SSH Authentication | Commands Collected |
+|---|---|---|
+| MASON-R1 | Successful | 9/9 |
+| MASON-SW1 | Successful | 9/9 |
+| TROY-SW1 | Successful | 12/12 |
+| **Total** | **3/3** | **30/30** |
+
+All 30 monitoring commands returned a `collected` status without detected command errors.
+
+### Troubleshooting
+
+Several issues were identified and resolved during implementation:
+
+- Modern SSH clients rejected legacy Cisco SSH algorithms.
+- Paramiko 5.1.0 could not negotiate compatible key exchange algorithms.
+- A dedicated Python virtual environment using Netmiko 4.8.0 and Paramiko 3.5.1 restored compatibility.
+- TROY-SW1's management VLAN was initially down because no VLAN 10 access port had an active connection.
+- Windows initially routed Troy management traffic through the desktop's normal Wi-Fi gateway.
+- A specific route through MASON-R1 restored management connectivity.
+- The Python script was adjusted to avoid issuing unsupported OSPF commands to MASON-SW1.
+
+### Validation Limitations
+
+- Successful command collection does not independently verify the health of every network service.
+- Unauthorized SSH access rejection and management ACL enforcement remain to be tested.
+- Port security and BPDU Guard enforcement testing remains outstanding.
+- The legacy Cisco devices still require outdated SSH algorithms.
+- Automated configuration backups are not implemented by the monitoring script.
+
+### Result
+
+**Status: PASS — Cisco management authentication and three-device Python network monitoring validated.**
+
+The automation successfully collected 30 monitoring command outputs from all three physical Cisco devices.
+
+Supporting documentation:
+
+- [Network Validation](validation.md)
+- [Python Network Monitoring](../automation/network-monitoring/README.md)
+- [Troubleshooting](troubleshooting.md)
+
 ### Validation
 
 Cisco IOS configuration and verification commands confirmed the implemented security controls.

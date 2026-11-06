@@ -1198,6 +1198,156 @@ No permanent corrective action or successful restoration of VMnet1 management co
 - Record bidirectional connectivity results and supporting evidence after further troubleshooting.
 
 
+---
+
+## Cisco Legacy SSH Compatibility — November 6, 2026
+
+### Problem
+
+The Windows management workstation could reach the Cisco devices, but modern SSH clients initially failed to establish compatible sessions.
+
+MASON-R1 and TROY-SW1 use legacy Cisco IOS SSH algorithms that are not enabled by default in modern Windows OpenSSH.
+
+### Investigation
+
+MASON-R1 initially reported incompatible key exchange and host key algorithms.
+
+TROY-SW1 required additional compatibility for:
+
+- `diffie-hellman-group1-sha1` key exchange
+- `ssh-rsa` host key signatures
+- `aes128-cbc` encryption
+- `hmac-sha1` message authentication
+
+The Python monitoring script also initially failed because Paramiko 5.1.0 did not support the required legacy key exchange algorithms.
+
+### Resolution
+
+Temporary, connection-specific OpenSSH compatibility options allowed interactive SSH authentication.
+
+For Python automation, a dedicated virtual environment was created using:
+
+- Netmiko 4.8.0
+- Paramiko 3.5.1
+
+These versions supported the required legacy SSH negotiation.
+
+### Validation
+
+Successful SSH authentication was confirmed from the management workstation to:
+
+- MASON-R1
+- MASON-SW1
+- TROY-SW1
+
+The Python monitoring script subsequently authenticated to all three devices.
+
+### Security Limitation
+
+The legacy SSH algorithms remain a security weakness. Compatibility was established for the isolated capstone management network, but upgrading to equipment or IOS software supporting stronger algorithms is recommended for future improvement.
+
+**Status: Resolved for lab connectivity; legacy cryptographic limitations remain.**
+
+---
+
+## Troy Management Connectivity and Windows Routing — November 6, 2026
+
+### Problem
+
+The management desktop could access Mason devices but initially could not reach TROY-SW1 at `10.20.10.1`.
+
+### Investigation
+
+TROY-SW1's management SVI was initially `up/down` because no active access port was maintaining VLAN 10.
+
+A management access port was connected, bringing the VLAN 10 interface operational.
+
+MASON-R1 then successfully learned `10.20.10.0/24` through OSPF and completed five successful ICMP tests to `10.20.10.1`.
+
+However, the Windows desktop continued to experience connectivity failures.
+
+Inspection of the Windows IPv4 routing table revealed two default routes:
+
+- Home network gateway: `192.168.1.254`
+- Mason management gateway: `10.10.10.1`
+
+Windows preferred the home network route because of its lower metric.
+
+### Resolution
+
+A specific route was added to direct Troy management traffic through MASON-R1 using the USB-to-Ethernet management adapter.
+
+```powershell
+route add 10.20.10.0 mask 255.255.255.0 10.10.10.1 metric 1 IF 12
+```
+
+Interface 12 was specific to the test workstation.
+
+### Validation
+
+After correcting the routing path, the workstation successfully reached TROY-SW1 and established an authenticated SSH session.
+
+The Python monitoring script subsequently connected to TROY-SW1 and collected all 12 scheduled monitoring commands.
+
+**Status: Resolved and operationally validated.**
+
+---
+
+## Python Network Monitoring Script Troubleshooting — November 6, 2026
+
+### Problem
+
+The initial Python monitoring implementation encountered SSH compatibility failures, unsupported Cisco IOS commands, and local project-file organization errors.
+
+### Investigation
+
+The script successfully identified reachable devices, but SSH connections initially failed because the installed Paramiko version could not negotiate compatible key exchange algorithms.
+
+After resolving SSH compatibility, MASON-SW1 returned an invalid-input error for:
+
+```text
+show ip ospf neighbor
+```
+
+MASON-SW1 operates as a Layer 2 switch and does not participate in OSPF.
+
+Additional troubleshooting identified two copies of `devices.json` in nested project directories. Changes to the outer inventory were not reflected when Python loaded the inner inventory.
+
+A duplicated `ROUTER_COMMANDS` declaration also caused a Python syntax error.
+
+### Resolution
+
+- Created a dedicated Python virtual environment using compatible Netmiko and Paramiko versions.
+- Separated common monitoring commands from router-specific and switch-specific commands.
+- Configured additional routing commands for TROY-SW1 through the device inventory.
+- Corrected the duplicated Python declaration and verified syntax using `py_compile`.
+- Identified the correct inventory path and explicitly supplied it when running the script.
+- Corrected Windows routing to restore Troy management connectivity.
+
+### Validation
+
+The final monitoring run successfully authenticated to all three Cisco devices.
+
+| Device | Commands Collected |
+|---|---|
+| MASON-R1 | 9/9 |
+| MASON-SW1 | 9/9 |
+| TROY-SW1 | 12/12 |
+| **Total** | **30/30** |
+
+The generated JSON summary confirmed that every scheduled command received a `collected` status without detected command errors.
+
+The script also generated timestamped text files and structured monitoring results.
+
+This validates automated evidence collection, not the health of every monitored network service.
+
+**Status: Resolved — Three-device Python network monitoring successfully validated.**
+
+**Supporting documentation:** [Python Network Monitoring](../automation/network-monitoring/README.md)
+
+---
+
+
 
 
 

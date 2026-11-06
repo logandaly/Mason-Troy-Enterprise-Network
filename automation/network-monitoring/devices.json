@@ -1,0 +1,25 @@
+
+{
+  "devices": [
+    {
+      "name": "MASON-R1",
+      "host": "10.10.10.1",
+      "kind": "router"
+    },
+    {
+      "name": "MASON-SW1",
+      "host": "10.10.10.2",
+      "kind": "switch"
+    },
+    {
+      "name": "TROY-SW1",
+      "host": "10.20.10.1",
+      "kind": "switch",
+    "extra_commands": [
+    "show ip route",
+    "show ip ospf neighbor",
+    "show ip protocols"
+  ]
+}
+  ]
+}
