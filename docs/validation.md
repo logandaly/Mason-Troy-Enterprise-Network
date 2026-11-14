@@ -1297,7 +1297,13 @@ Traffic counters confirm that packets matched firewall policies but do not indep
 
 The allow/deny tests provide separate behavioral evidence of policy enforcement.
 
-The Mason-to-FortiGate transit network (10.10.40.0/30) subsequently experienced an unresolved ARP connectivity failure. Earlier successful firewall policy and Internet connectivity tests remain valid historical evidence, but current end-to-end Internet connectivity requires revalidation. The separate FortiGate VMnet1 management connectivity issue also remains unresolved.
+The previously observed Mason-to-FortiGate transit connectivity issue was subsequently resolved, with successful communication between MASON-R1 and FortiGate.
+
+Final connectivity testing confirmed external TCP/443 reachability from the Mason Windows Server and successful HTTPS communication from the Troy Windows 11 client.
+
+Internet-directed ICMP ping and traceroute tests continued to experience timeouts. The configured FortiGate outbound service restrictions are a possible explanation, but firewall deny logs have not conclusively confirmed the cause.
+
+The separate FortiGate VMnet1 management connectivity issue remains unresolved.
 
 ### Result
 
@@ -1473,7 +1479,95 @@ The following security features have been implemented and documented:
 - **Windows security auditing:** Advanced Audit Policy and multiple Security event categories validated.
 - **Workstation Group Policy:** Troy workstation restrictions and shared security baseline validated.
 
+## 29. Final Cross-Site Routing and Internet Connectivity Validation — November 2026
 
+### Objective
+
+Verify bidirectional routed connectivity between the Mason and Troy sites and confirm external HTTPS connectivity from both a Mason server and a Troy workstation.
+
+### Cross-Site Traceroute Validation
+
+**Troy Windows 11 to Mason Windows Server**
+
+A traceroute from TROY-WIN11-01 to `10.10.30.10` successfully reached the Mason Windows Server in three hops:
+
+1. `10.20.20.1` — TROY-SW1 employee VLAN gateway
+2. `10.255.0.1` — MASON-R1 WAN interface
+3. `10.10.30.10` — Mason Windows Server
+
+**Status: PASS**
+
+![Troy to Mason Traceroute](../screenshots/routing/Troy-Win11-to-Mason-Server-Traceroute-Validation.png)
+
+**Mason Windows Server to Troy VLAN 20**
+
+A reverse-direction traceroute successfully reached the Troy VLAN 20 client at `10.20.20.102` in three hops:
+
+1. `10.10.30.1` — MASON-R1 server VLAN gateway
+2. `10.255.0.2` — TROY-SW1 WAN interface
+3. `10.20.20.102` — Troy Windows 11 endpoint
+
+**Status: PASS**
+
+![Mason to Troy Traceroute](../screenshots/routing/Mason-Server-to-Troy-VLAN20-Traceroute-Validation.png)
+
+Together, these tests demonstrate successful routing between the Mason and Troy networks in both directions.
+
+### Mason Server Internet Connectivity
+
+The Mason Windows Server (`10.10.30.10`) executed:
+
+`Test-NetConnection example.com -Port 443`
+
+The test returned `TcpTestSucceeded: True`, confirming successful external DNS resolution and TCP connectivity on the HTTPS port.
+
+**Status: PASS — TCP 443 connectivity**
+
+![Mason Server HTTPS Connectivity](../screenshots/routing/Mason-WindowsServer-VLAN30-HTTPS-Internet-Validation.png)
+
+### Troy Workstation Internet Connectivity
+
+The Troy Windows 11 client (`10.20.20.102`) executed:
+
+`curl.exe -I https://example.com`
+
+The command returned `HTTP/1.1 200 OK`, confirming successful HTTPS communication and an HTTP response from an external web server.
+
+**Status: PASS — HTTPS application connectivity**
+
+![Troy Windows 11 HTTPS Connectivity](../screenshots/routing/Troy-Win11-VLAN20-HTTPS-Internet-Validation.png)
+
+### ICMP Testing Observation
+
+Internet-directed ICMP ping and Windows traceroute tests did not consistently succeed during the final validation.
+
+FortiGate outbound policies permit selected services, including DNS, HTTP, HTTPS, and NTP. ICMP is not included in the currently documented outbound service allowances.
+
+This is a possible explanation for the unsuccessful ICMP tests, but firewall deny logs have not conclusively established the cause.
+
+Successful TCP and HTTPS testing demonstrates that the observed ICMP limitations do not represent a complete loss of Internet connectivity.
+
+### Result
+
+**Status: PASS — Bidirectional intersite routing and external HTTPS connectivity validated.**
+
+Additional ICMP troubleshooting is optional and remains separate from the successful application-connectivity results.
+
+
+## 30. Wireless Network Assessment
+
+A proposed wireless expansion assessment was completed
+for the Mason and Troy facilities.
+
+The assessment covers estimated client capacity,
+bandwidth demand, access-point placement, segmentation,
+security, and future performance testing.
+
+Wireless hardware was not deployed or validated.
+
+**Status: ASSESSMENT COMPLETE — Deployment not in scope**
+
+See [Wireless Network Assessment](wireless-assessment.md).
 
 
 ## Validation Approach
