@@ -1,212 +1,123 @@
-﻿# Mason-Troy Enterprise Network
-
-
+﻿# Mason–Troy Enterprise Network
 
 ## Overview
 
+The Mason–Troy Enterprise Network is a **two-site hybrid enterprise/manufacturing network** integrating physical Cisco routing and switching equipment with virtualized infrastructure in GNS3. It provides segmented business connectivity between Mason (corporate headquarters) and Troy (manufacturing), centralized enterprise services, and controlled Internet access through a FortiGate virtual firewall.
 
+The project demonstrates hands-on network design, systems administration, security, troubleshooting, and Python automation. **Troy's Legacy/OT VLAN 30 is implemented and ACL-isolated; a production Windows XP/industrial endpoint is a design scenario, not a claimed completed deployment.**
 
-This project is a segmented two-site enterprise and manufacturing network designed to allow normal business traffic to communicate between locations and access the Internet while securely isolating a legacy Windows XP system required for manufacturing operations.
+**Project evidence:** [Network validation](docs/validation.md) · [Troubleshooting](docs/troubleshooting.md) · [IP/VLAN plan](docs/ip-vlan-plan.md) · [Python monitoring](automation/network-monitoring/README.md)
 
+## Project Highlights
 
-
-The purpose of this project is to demonstrate the networking, systems administration, security, and troubleshooting skills I developed throughout my education by designing and implementing a small enterprise network using both physical and virtual infrastructure.
-
-
-
-
+- **Hybrid lab:** Physical Cisco router and Catalyst switches integrated with GNS3-hosted Windows Server, Ubuntu Server, Windows clients, and a FortiGate VM.
+- **Two-site routing:** OSPF Area 0 adjacency and route exchange across `10.255.0.0/30`, with a default route propagated toward Troy.
+- **Six principal VLANs:** Management, employee, and server/Legacy-OT networks at the two sites, with a separate Mason firewall-transit network.
+- **Enterprise services:** Windows Server 2025 Active Directory Domain Services, DNS, Group Policy, auditing, SMB file sharing, and centralized Ubuntu Kea DHCP with Cisco relay.
+- **Security:** FortiGate policy controls and NAT, bidirectional extended ACL isolation for Troy Legacy/OT VLAN 30, Cisco switch/management hardening, and group-based SMB/NTFS permissions.
+- **Verified results:** Successful cross-site ping and three-hop traceroutes in both directions; Mason server TCP/443 reachability and Troy workstation HTTPS response (`HTTP/1.1 200 OK`).
+- **Automation:** Python/Netmiko monitoring successfully collected **30 of 30 planned commands** from MASON-R1, MASON-SW1, and TROY-SW1.
 
 ## Key Technologies
 
-
-
-- Cisco routing and switching
-
-- VLAN segmentation
-
-- Inter-VLAN routing
-
-- OSPF dynamic routing
-
-- Extended access control lists (ACLs)
-
-- FortiGate firewall
-
-- Windows Server 2025
-
-- Active Directory Domain Services (AD DS)
-
-- DNS
-
-- Ubuntu Server
-
-- DHCP and DHCP relay
-
-- GNS3 virtualization
-
-- Python and Netmiko automation
-
-- Wireshark network analysis and validation
-
-
-
-
+Cisco IOS routing and switching · VLANs and 802.1Q trunks · OSPF · Extended ACLs · FortiGate VM and NAT · Windows Server 2025 · Active Directory and Group Policy · DNS · Ubuntu and Kea DHCP · DHCP relay · GNS3 · Windows 11 · Python and Netmiko · PowerShell · Git and GitHub
 
 ## Network Architecture
 
+The network represents two locations in Ohio:
 
+- **Mason — Corporate Headquarters:** Physical MASON-R1 and MASON-SW1; primary Windows Server 2025 and Ubuntu infrastructure; centralized network services and FortiGate Internet edge.
+- **Troy — Manufacturing Facility:** Physical TROY-SW1 Layer 3 switch; employee workstation connectivity; and the segregated Legacy/OT VLAN 30.
 
-The network represents two business locations in Ohio:
+The sites are linked by the point-to-point **`10.255.0.0/30`** WAN (MASON-R1 `10.255.0.1`, TROY-SW1 `10.255.0.2`). OSPF exchanges the site networks. At Mason, MASON-R1 uses router-on-a-stick subinterfaces for VLAN routing, while TROY-SW1 provides Layer 3 switching at Troy. The FortiGate is a **virtual appliance**, connected via Mason's firewall transit network (`10.10.40.0/30`) and an upstream simulated/lab Internet path.
 
+| Site | VLAN | Purpose | Subnet |
+|---|---:|---|---|
+| Mason | 10 | Management | `10.10.10.0/24` |
+| Mason | 20 | Employees | `10.10.20.0/24` |
+| Mason | 30 | Servers | `10.10.30.0/24` |
+| Troy | 10 | Management | `10.20.10.0/24` |
+| Troy | 20 | Employees | `10.20.20.0/24` |
+| Troy | 30 | Legacy / OT | `10.20.30.0/24` |
 
+Mason additionally uses VLAN 40 for firewall transit and VLAN 999 as a native/management VLAN in the trunk design. See the [complete IP addressing and VLAN plan](docs/ip-vlan-plan.md) for device-specific addressing and DHCP scopes.
 
-- **Mason — Corporate Headquarters:** Hosts the primary server infrastructure, network services, security edge, and centralized management resources.
+## Project Goals and Outcomes
 
-- **Troy — Manufacturing Facility:** Provides connectivity for standard business systems while maintaining a segmented legacy/OT environment for manufacturing equipment.
-
-
-
-The two sites are connected through a routed WAN and use OSPF for dynamic route exchange. VLANs separate network functions and device types, while routing, ACLs, and firewall policies provide controlled communication between network segments.
-
-
-
-The environment combines physical Cisco networking equipment with virtualized infrastructure in GNS3, allowing the project to incorporate real hardware while using virtualization for servers, security appliances, and other systems where appropriate.
-
-
-
-
-
-## Project Goals
-
-
-
-- Design and implement a functional two-site enterprise network using physical and virtual infrastructure.
-
-- Segment business, management, server, and manufacturing traffic using VLANs.
-
-- Provide dynamic routing between the Mason and Troy sites using OSPF.
-
-- Deploy centralized network services including Active Directory, DNS, and DHCP.
-
-- Provide controlled Internet connectivity through a FortiGate security firewall.
-
-- Securely isolate the legacy Windows XP manufacturing environment using VLAN segmentation, ACLs, and firewall policies.
-
-- Apply network and switch hardening techniques to reduce unnecessary access and services.
-
-- Automate basic network administration and configuration backup tasks using Python and Netmiko.
-
-- Validate network functionality and troubleshoot problems using Cisco IOS commands, server administration tools, and Wireshark.
-
-- Document the design, implementation, troubleshooting process, and validation results as a technical portfolio project.
-
-
-
-
+| Goal | Documented outcome |
+|---|---|
+| Connect physical and virtual infrastructure | Implemented and validated |
+| Segment sites and traffic classes | Implemented VLAN segmentation and routing |
+| Establish intersite routing | OSPF neighbor FULL; bidirectional route propagation verified |
+| Centralize identity, DNS, and DHCP | AD DS/DNS deployed; six-VLAN Kea DHCP and relay validated |
+| Apply layered security | FortiGate policies, Troy Legacy/OT ACLs, SSH/port hardening, and SMB/NTFS DAC tested to the extent described in validation records |
+| Demonstrate external connectivity | Mason TCP/443 and Troy HTTPS tests passed |
+| Automate monitoring | Netmiko read-only collection: 30/30 planned commands |
+| Document and troubleshoot | Repository records tests, limitations, screenshots, and troubleshooting investigations |
 
 ## Current Project Status
 
-### Completed
+### Completed and Validated
 
-- Physical Mason and Troy Cisco network infrastructure
-- VLAN configuration and initial network segmentation
-- Mason router-on-a-stick inter-VLAN routing
-- Troy Layer 3 switching and inter-VLAN routing
-- Routed Mason-Troy WAN connection
-- OSPF adjacency and bidirectional dynamic route propagation
-- OSPF default-route advertisement from Mason to Troy
-- GNS3 integration with physical Cisco infrastructure
-- Windows Server 2025 and Ubuntu Server deployment
-- Active Directory Domain Services and `masonmfg.internal` domain
-- Mason and Troy organizational units, users, and security groups
-- AD-integrated DNS, reverse DNS, and external DNS resolution
-- Centralized Kea DHCP configuration for all six VLANs
-- Successful DHCP lease validation across all six VLANs
-- DHCP relay between routed networks and the Kea server
-- Mason and Troy Windows 11 Pro workstation deployment
-- Active Directory domain join and authentication at both sites
-- Domain Workstation Security Baseline application
-- Troy Run restriction and Settings About-page restriction validation
-- Windows Advanced Audit Policy configuration and successful event logging
-- Kerberos service ticket auditing
-- Cross-site SMB file sharing through CompanyShare
-- Shared-resource security group membership validation
-- NTFS and SMB share permission validation
-- Successful file modification from Troy and verification on Mason Server
-- Previously validated FortiGate NAT and Internet connectivity
-- Troy Legacy/OT VLAN 30 isolation using bidirectional extended ACLs
-- Before-and-after Legacy/OT connectivity testing and ACL deny-counter validation
-- FortiGate firewall policy enforcement, permitted/denied traffic testing, and traffic logging
-- Troy switch security hardening, including port security, PortFast, BPDU Guard, and SSHv2
-- Disabled HTTP and HTTPS management services on TROY-SW1
-- Documented 16 project milestones and 15 troubleshooting cases
-- Cisco and GNS3 troubleshooting with documented findings and resolutions
+- Physical Mason and Troy Cisco networking infrastructure and GNS3 integration.
+- VLAN segmentation, Mason router-on-a-stick routing, and Troy Layer 3 SVIs.
+- Point-to-point Mason–Troy WAN, OSPF FULL adjacency, bidirectional routes, and OSPF default-route propagation.
+- Windows Server 2025 and Ubuntu Server deployments, AD DS forest `masonmfg.internal`, AD DNS and reverse DNS.
+- Mason and Troy OUs, user accounts, security groups, domain-joined Windows workstations, and tested workstation GPOs.
+- Centralized Kea DHCP scopes for all six principal VLANs, with associated client validation and remote DHCP relay.
+- Windows auditing and observed successful security events; cross-site SMB/CompanyShare access and file modification using group-based permissions.
+- Troy Legacy/OT VLAN 30 routed isolation with bidirectional ACLs and deny-counter evidence.
+- FortiGate firewall policy configuration, NAT, traffic logging, and successful external application connectivity from both sites.
+- Cisco management hardening (including SSHv2), selected switch port security, PortFast, and BPDU Guard configuration verification.
+- Resolved GNS3/USB Ethernet port-security issue affecting the Troy workstation; subsequent DHCP and cross-site connectivity restored.
+- Bidirectional Mason–Troy three-hop traceroutes and four final routing/Internet-validation screenshots.
+- Read-only Python/Netmiko monitoring with **30/30** commands successfully collected from three physical Cisco devices.
+- Wireless client-volume, bandwidth, AP placement, and security **assessment** for a possible future deployment (not a deployed WLAN).
 
-### In Progress / Planned
+### Remaining Limitations and Optional Future Work
 
-- Revalidate and troubleshoot FortiGate VLAN 40 transit connectivity
-- Complete FortiGate management hardening
-- Complete remaining Mason-specific Group Policy validation
-- Investigate the remaining direct UNC navigation restriction for CompanyShare
-- Configure centralized logging and monitoring
-- Develop Python/Netmiko monitoring and configuration backup automation
-- Complete additional Wireshark analysis and security validation
-- Perform final end-to-end connectivity and security testing
-- Complete architecture diagrams and final project documentation
-- Revalidate DHCP functionality on Troy Legacy/OT VLAN 30 after ACL deployment
-- Complete optional behavioral testing of Troy switch port security, BPDU Guard, and Telnet rejection
+- FortiGate VMnet1 management connectivity investigation and further management hardening.
+- Confirm why Internet-directed ICMP ping/traceroute was inconsistent in later tests; FortiGate service restrictions are a leading explanation, **not a log-confirmed root cause**. HTTPS connectivity was validated separately.
+- Mason-specific user Group Policy behavior remains partially untested.
+- Investigate the historical direct-UNC-navigation restriction for CompanyShare (mapped drive read/write was validated).
+- Revalidate DHCP on Troy Legacy/OT VLAN 30 after ACL enforcement.
+- Optional unauthorized-device port-security and BPDU Guard behavior tests, and independent Telnet-rejection validation.
+- Further Wireshark packet analysis, centralized monitoring/logging, and automated configuration backups.
+- Wireless deployment, RF survey, throughput testing, and any legacy Windows XP/industrial endpoint deployment are **future work**, not completed features.
+
+The [validation document](docs/validation.md) distinguishes completed behavior tests from configuration-only verification and outstanding work. A successful HTTPS test does not by itself establish that every Internet protocol is permitted.
 
 ## Project Documentation and Evidence
 
-The following documents provide detailed implementation records, configuration information, troubleshooting investigations, and validation evidence for the Mason–Troy Enterprise Network.
-
-| Document | Description |
+| Document | Contents |
 |---|---|
-| [Network Architecture](docs/architecture.md) | Physical and virtual topology, routing, network services, and security architecture |
-| [IP Addressing and VLAN Plan](docs/ip-vlan-plan.md) | VLANs, subnets, gateways, DHCP scopes, and infrastructure addressing |
-| [Hardware and Software Inventory](docs/hardware-software.md) | Physical Cisco equipment, virtualization hosts, operating systems, and supporting tools |
-| [Project Milestones](docs/milestones.md) | 16 implementation milestones documenting project progress |
-| [Network Validation](docs/validation.md) | Connectivity, routing, DHCP, Active Directory, firewall, ACL, and security testing evidence |
-| [Troubleshooting Cases](docs/troubleshooting.md) | 15 documented troubleshooting investigations, including confirmed resolutions and unresolved issues |
+| [Network Architecture](docs/architecture.md) | Physical/virtual topology, intersite routing, and enterprise services |
+| [IP Addressing and VLAN Plan](docs/ip-vlan-plan.md) | Subnets, VLANs, gateways, and DHCP scope design |
+| [Hardware and Software Inventory](docs/hardware-software.md) | Physical Cisco devices, virtual systems, and supporting tools |
+| [Project Milestones](docs/milestones.md) | Implementation progress and significant checkpoints |
+| [Network Validation](docs/validation.md) | Tests and linked screenshots for routing, DHCP, AD, firewall, ACLs, and connectivity |
+| [Troubleshooting Cases](docs/troubleshooting.md) | Symptoms, diagnostic steps, confirmed findings, fixes, and limitations |
+| [Wireless Assessment](docs/wireless-assessment.md) | Proposed client volume, bandwidth, placement, security, and validation plan |
+| [Python Network Monitoring](automation/network-monitoring/README.md) | Netmiko monitoring workflow, configuration, and validation results |
 
-### Evidence and Validation
+### Selected Final Validation Evidence
 
-The [Network Validation](docs/validation.md) document is the primary index of configuration screenshots, connectivity tests, and security validation evidence.
-
-The [Troubleshooting Cases](docs/troubleshooting.md) document records technical problems, diagnostic procedures, findings, resolutions, and lessons learned.
-
-Validation results distinguish successfully tested functionality from configuration-only verification and outstanding tests.
-
-
+- [Troy Windows 11 → Mason Windows Server traceroute](screenshots/routing/Troy-Win11-to-Mason-Server-Traceroute-Validation.png)
+- [Mason Windows Server → Troy Windows 11 traceroute](screenshots/routing/Mason-Server-to-Troy-VLAN20-Traceroute-Validation.png)
+- [Mason Windows Server external TCP/443 test](screenshots/routing/Mason-WindowsServer-VLAN30-HTTPS-Internet-Validation.png)
+- [Troy Windows 11 external HTTPS response](screenshots/routing/Troy-Win11-VLAN20-HTTPS-Internet-Validation.png)
+- [Cisco OSPF routing and management hardening evidence](screenshots/routing/Mason-R1-OSPF-Hardening-and-Adjacency-Validation.png)
 
 ## Repository Structure
 
+- `automation/network-monitoring/` — Python/Netmiko network monitoring code and instructions.
+- `docs/` — Architecture, VLAN plan, inventory, milestones, validation, troubleshooting, and wireless assessment.
+- `screenshots/` — Captured implementation, security, routing, and connectivity evidence.
 
+Additional configuration examples and diagrams, where present, supplement the linked documentation. The GitHub documents and screenshots are the primary evidence index for this portfolio.
 
-- `automation/` — Python and Netmiko network automation scripts
+## Validation Approach
 
-- `configs/` — Sanitized device configuration backups
+**Build → Verify Configuration → Test → Troubleshoot → Retest → Document → Commit**
 
-   - `mason/` — Mason router and switch configurations
-
-   - `troy/` — Troy switch configurations
-
-   - `fortigate/` — FortiGate configuration documentation
-
-- `diagrams/` — Network topology and architecture diagrams
-
-- `docs/` — Detailed project documentation
-
-   - `architecture.md` — Physical and virtual network architecture
-
-   - `hardware-software.md` — Hardware, operating systems, and software used
-
-   - `ip-vlan-plan.md` — VLAN, subnet, gateway, and addressing plan
-
-   - `milestones.md` — Project implementation progress
-
-   - `troubleshooting.md` — Problems encountered, investigation, fixes, and lessons learned
-
-   - `validation.md` — Connectivity, routing, service, and security validation
-
-- `screenshots/` — Supporting configuration and validation evidence
+A configuration is not described as behaviorally validated unless supporting testing was actually performed. Sensitive credentials are excluded from published evidence.
