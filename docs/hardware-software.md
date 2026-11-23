@@ -124,7 +124,8 @@ Windows Server 2025 Standard Evaluation provides the primary Microsoft enterpris
 - NTFS and SMB share permissions
 - Windows Security auditing configured through a dedicated Group Policy Object (GPO).
 - Advanced Audit Policy settings verified for authentication, Kerberos, user account management, security group management, computer account management, and directory service changes.
-- Security Event IDs 4624, 4625, 4768, 4769, 4738, 4728, 4729, 4737, and 5136 observed during validation.
+- Windows Security auditing was validated through recorded authentication, Kerberos, account-management, security-group, and Active Directory modification events, including Event IDs 4624, 4768, 4769, 4738, 4728, 4729, and 5136.
+- Failed-logon auditing was verified as enabled through effective policy configuration. Event ID 4625 generation has not been independently confirmed in the available evidence.
 - Active Directory object-change auditing validated using an organizational unit (OU) System Access Control List (SACL) and Event ID 5136.
 - Computer Account Management auditing confirmed through effective policy settings; corresponding event generation was not independently tested.
 - Internal DNS and external domain resolution
@@ -140,7 +141,7 @@ Windows Server 2025 Standard Evaluation provides the primary Microsoft enterpris
 
 
 
-### Windows 11 Enterprise Workstations
+### Windows 11 Pro Workstations
 
 Two Windows 11 Pro virtual machines provide employee endpoint testing at the Mason and Troy sites.
 
@@ -223,14 +224,20 @@ A FortiGate virtual firewall provides the security edge between the enterprise n
 - Internal-to-Internet firewall policy
 - Network Address Translation (NAT)
 - Static routing toward internal enterprise networks
-- Previously validated Internet connectivity from Mason and Troy
-- Firewall policy logging and traffic monitoring
+- Validated Internet connectivity from Mason and Troy, including successful external TCP/443 and HTTPS testing- Firewall policy logging and traffic monitoring
 - Validated permitted and denied traffic behavior
 - Firewall policy hit counters and traffic logs used as security validation evidence
 
+
 **Current validation status:**
 
-The FortiGate Internet path was previously operational. A subsequent ARP failure on the `10.10.40.0/30` transit network remains unresolved and requires revalidation.
+The previously observed Mason-to-FortiGate transit connectivity failure was subsequently resolved. Successful communication between MASON-R1 and the FortiGate transit interface was verified.
+
+Final connectivity testing demonstrated successful external TCP/443 reachability from the Mason Windows Server and an HTTP/1.1 200 OK response from the Troy Windows 11 workstation using HTTPS.
+
+Internet-directed ICMP ping and traceroute tests experienced timeouts during later validation. FortiGate service restrictions remain a possible explanation, but firewall deny logs have not conclusively established the cause.
+
+The separate FortiGate VMnet1 management connectivity issue remains unresolved.
 
 **Planned enhancements:**
 
@@ -289,3 +296,20 @@ The environment includes:
 | USB-to-Ethernet Adapter | Physical bridge between GNS3 virtual networks and the Cisco lab |
 
 | PowerShell | Windows administration, network configuration, and troubleshooting |
+
+### Python Network Monitoring Automation
+
+A read-only Python monitoring script was developed using Netmiko to collect network status and configuration information from three physical Cisco devices.
+
+**Validated results:**
+
+- MASON-R1: 9/9 commands collected.
+- MASON-SW1: 9/9 commands collected.
+- TROY-SW1: 12/12 commands collected.
+- **Total: 30/30 commands successfully collected.**
+
+The automation generates timestamped output and structured JSON results for network monitoring and capstone evidence.
+
+Automated configuration backups remain a potential future enhancement.
+
+**Documentation:** [Python Network Monitoring](../automation/network-monitoring/README.md)

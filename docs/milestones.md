@@ -515,9 +515,10 @@ External DNS resolution was validated using:
 ### Outstanding Items
 
 - The original direct UNC navigation restriction remains unexplained, although mapped-drive access and file modification are working.
-- Windows Security Event ID 4625 was subsequently observed and validated, confirming failed-logon auditing behavior.
+- Failed-logon auditing was verified as enabled through effective Windows audit policy. Event ID 4625 generation has not been independently confirmed in the available validation evidence.
 - Troy Legacy/OT VLAN 30 isolation and FortiGate firewall policy testing were completed in later project phases and are documented separately.
-- Additional FortiGate management hardening, unresolved transit connectivity troubleshooting, and network automation remain future work.
+- Additional FortiGate management hardening and investigation of the separate VMnet1 management connectivity issue remain outstanding. The transit connection was subsequently restored, and Python monitoring automation was completed in later milestones.
+
 ### Result
 
 **Status: PASS — Cross-site SMB access, authentication auditing, DNS, and security configuration validation**
@@ -586,16 +587,16 @@ FortiGate traffic logs provided additional visibility into policy enforcement.
 
 ### Validation Limitations
 
-- The dedicated Mason-to-FortiGate transit network (`10.10.40.0/30`) subsequently experienced an unresolved ARP connectivity failure.
-- Earlier successful Internet connectivity tests remain valid historical evidence, but current end-to-end connectivity requires revalidation.
-- The separate FortiGate VMnet1 management connectivity investigation remains unresolved.
-- Firewall policy validation does not establish that every possible traffic scenario has been tested.
-
+- The previously observed Mason-to-FortiGate transit connectivity failure was subsequently resolved.
+- Final testing confirmed successful TCP/443 connectivity from the Mason Windows Server and HTTPS communication from the Troy Windows 11 workstation.
+- Internet-directed ICMP ping and traceroute tests experienced timeouts. FortiGate service restrictions are a possible explanation, but firewall deny logs have not conclusively confirmed the cause.
+- The separate FortiGate VMnet1 management connectivity issue remains unresolved.
+- Firewall policy testing does not establish that every possible traffic scenario has been validated.
 ### Result
 
 **Status: PASS — FortiGate firewall policy enforcement and logging validated for the tested traffic scenarios.**
 
-**Outstanding:** Revalidate the Mason-to-FortiGate transit connection and investigate the separate VMnet1 management connectivity issue.
+**Outstanding:** Investigate the separate FortiGate VMnet1 management connectivity issue and optionally verify the cause of Internet-directed ICMP timeouts.
 
 Supporting screenshots and test results are documented in [Network Validation](validation.md). Additional investigation details are recorded in [Troubleshooting](troubleshooting.md).
 
@@ -613,6 +614,36 @@ Supporting screenshots and test results are documented in [Network Validation](v
 - Enabled SSH version 2 for encrypted remote switch administration.
 - Disabled HTTP and HTTPS management services.
 - Captured switch configuration and operational verification evidence.
+
+### Validation
+
+Cisco IOS configuration and verification commands confirmed the implemented security controls.
+
+Port security settings were verified on the configured access ports, including the maximum MAC address limit and violation mode.
+
+PortFast and BPDU Guard configuration was inspected to confirm the intended access-port protections.
+
+SSH management configuration and operational status were verified.
+
+HTTP and HTTPS management services were confirmed disabled.
+
+### Validation Limitations
+
+Port-security enforcement was observed during troubleshooting. The following limitations remain:
+
+- Port-security violation behavior was observed during November troubleshooting on TROY-SW1 Fa0/3. A separate, deliberate unauthorized-device test was not performed.
+- Introducing a BPDU to verify BPDU Guard enforcement.
+- Attempting a Telnet connection to confirm rejection.
+
+Port-security restrict-mode behavior was observed, while BPDU Guard enforcement and Telnet rejection remain configuration-validated or untested, as described above.
+
+### Result
+
+**Status: PASS — Troy switch security hardening configuration verified.**
+
+**Outstanding:** Optional behavioral enforcement testing.
+
+Supporting screenshots and command output are documented in [Network Validation](validation.md).
 
 ---
 
@@ -661,7 +692,7 @@ Several issues were identified and resolved during implementation:
 
 - Successful command collection does not independently verify the health of every network service.
 - Unauthorized SSH access rejection and management ACL enforcement remain to be tested.
-- Port security and BPDU Guard enforcement testing remains outstanding.
+- Port-security enforcement was observed on TROY-SW1 Fa0/3 during November troubleshooting. The USB-to-Ethernet adapter and virtual workstation presented two MAC addresses on a port limited to one. Restrict-mode violation counters increased, and connectivity was restored after increasing the MAC address limit to two. BPDU Guard enforcement remains untested.
 - The legacy Cisco devices still require outdated SSH algorithms.
 - Automated configuration backups are not implemented by the monitoring script.
 
@@ -677,32 +708,56 @@ Supporting documentation:
 - [Python Network Monitoring](../automation/network-monitoring/README.md)
 - [Troubleshooting](troubleshooting.md)
 
-### Validation
 
-Cisco IOS configuration and verification commands confirmed the implemented security controls.
+---
 
-Port security settings were verified on the configured access ports, including the maximum MAC address limit and violation mode.
+## Milestone 18 — Final Cross-Site and Internet Connectivity Validation
 
-PortFast and BPDU Guard configuration was inspected to confirm the intended access-port protections.
+**Date:** November 2026
 
-SSH management configuration and operational status were verified.
+### Completed
 
-HTTP and HTTPS management services were confirmed disabled.
+- Restored Troy Windows 11 connectivity after diagnosing a port-security MAC address limitation.
+- Verified successful DHCP renewal and network connectivity from the Troy workstation.
+- Validated bidirectional communication between the Mason and Troy sites.
+- Captured successful traceroutes across the physical Mason–Troy WAN in both directions.
+- Verified external TCP/443 connectivity from the Mason Windows Server.
+- Verified successful HTTPS communication from the Troy Windows 11 workstation.
+- Completed a proposed wireless network assessment covering client capacity, bandwidth, access-point placement, and security.
 
-### Validation Limitations
+### Connectivity Validation
 
-The following behavioral tests were not independently completed:
+**Troy to Mason:**
 
-- Connecting an unauthorized device to trigger a port security violation.
-- Introducing a BPDU to verify BPDU Guard enforcement.
-- Attempting a Telnet connection to confirm rejection.
+`10.20.20.102 → 10.20.20.1 → 10.255.0.1 → 10.10.30.10`
 
-These controls are configuration-validated but should not be described as behaviorally validated.
+**Mason to Troy:**
+
+`10.10.30.10 → 10.10.30.1 → 10.255.0.2 → 10.20.20.102`
+
+Both traceroutes successfully reached their destinations in three hops.
+
+### Internet Validation
+
+The Mason Windows Server successfully completed a TCP connection to `example.com` on port 443.
+
+The Troy Windows 11 workstation successfully executed:
+
+`curl.exe -I https://example.com`
+
+The request returned `HTTP/1.1 200 OK`.
 
 ### Result
 
-**Status: PASS — Troy switch security hardening configuration verified.**
+**Status: PASS — Bidirectional intersite routing and external HTTPS connectivity validated.**
 
-**Outstanding:** Optional behavioral enforcement testing.
+Internet-directed ICMP restrictions remain an optional investigation. The wireless assessment documents a proposed future deployment, not a completed wireless installation.
 
-Supporting screenshots and command output are documented in [Network Validation](validation.md).
+### Supporting Evidence
+
+- [Network Validation](validation.md)
+- [Wireless Assessment](wireless-assessment.md)
+- [Troy-to-Mason Traceroute](../screenshots/routing/Troy-Win11-to-Mason-Server-Traceroute-Validation.png)
+- [Mason-to-Troy Traceroute](../screenshots/routing/Mason-Server-to-Troy-VLAN20-Traceroute-Validation.png)
+- [Mason HTTPS Connectivity](../screenshots/routing/Mason-WindowsServer-VLAN30-HTTPS-Internet-Validation.png)
+- [Troy HTTPS Connectivity](../screenshots/routing/Troy-Win11-VLAN20-HTTPS-Internet-Validation.png)

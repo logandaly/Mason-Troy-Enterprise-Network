@@ -171,7 +171,7 @@ Troy represents the manufacturing facility and contains both standard business s
 
 TROY-SW1 implements additional Layer 2 and management-plane security controls to protect the manufacturing network.
 
-- **Port security:** Configured on 12 access ports, allowing a maximum of one learned MAC address per port with violation mode set to `restrict`.
+- **Port security:** Configured on 12 access ports with violation mode `restrict`. Most protected ports allow one MAC address; TROY-SW1 Fa0/3 was adjusted to allow two MAC addresses to support the GNS3 USB-to-Ethernet bridge and virtual workstation.
 - **PortFast:** Enabled on designated access ports to allow connected endpoints to transition promptly into forwarding.
 - **BPDU Guard:** Configured on designated access ports to protect against unexpected spanning-tree participation.
 - **SSH management:** SSH version 2 is enabled for encrypted remote administration.
@@ -179,7 +179,9 @@ TROY-SW1 implements additional Layer 2 and management-plane security controls to
 
 Configuration and operational checks confirmed these controls were enabled.
 
-Unauthorized MAC address enforcement, BPDU Guard violation behavior, and Telnet rejection were not independently tested. These remain validation opportunities rather than confirmed behavioral results.
+Port-security enforcement was observed on TROY-SW1 Fa0/3 during November troubleshooting. The switch recorded 108 violations when the USB-to-Ethernet adapter and virtual workstation presented two MAC addresses on a port limited to one. Increasing the permitted MAC address limit to two restored workstation connectivity.
+
+A separate deliberate unauthorized-device test was not performed. BPDU Guard enforcement and Telnet rejection remain untested.
 
 Supporting configuration and verification screenshots are documented in [Validation Evidence](validation.md).
 
@@ -349,9 +351,9 @@ The FortiGate provides centralized firewall policy enforcement for traffic cross
 - Firewall policy counters and traffic logs provide visibility into traffic matching those policies.
 - Controlled testing demonstrated permitted and denied traffic behavior.
 - Before-and-after screenshots documented changes in firewall policy counters. Counter increases demonstrate traffic matching the policies, not necessarily a firewall configuration change.
-- FortiGate firewall policy validation is documented separately from the unresolved Mason-to-FortiGate transit connectivity issue.
+- FortiGate firewall policy enforcement was validated through controlled traffic testing. The previously observed Mason-to-FortiGate transit connectivity failure was subsequently resolved.
 
-The FortiGate transit network (`10.10.40.0/30`) requires revalidation before current end-to-end Internet connectivity can be considered confirmed.
+Subsequent testing confirmed restored connectivity between MASON-R1 and the FortiGate on the `10.10.40.0/30` transit network. External TCP/443 connectivity from the Mason Windows Server and an HTTP/1.1 200 OK response over HTTPS from the Troy Windows 11 workstation were also validated.
 
 ### Internet Traffic Path
 
@@ -379,18 +381,30 @@ FortiGate firewall policies provide additional security enforcement at the enter
 
 ### FortiGate Transit Validation Status
 
-The FortiGate Internet path was previously validated through successful external connectivity tests from Mason infrastructure and the Troy Windows 11 workstation.
+The FortiGate Internet path was initially validated, followed by a temporary connectivity failure on the `10.10.40.0/30` transit network.
 
-During subsequent testing, connectivity across the dedicated `10.10.40.0/30` transit network failed.
+During the failure:
 
-- MASON-R1 transit address: `10.10.40.2/30`
-- FortiGate port3 address: `10.10.40.1/30`
-- Both interfaces appeared operational.
-- MASON-R1 reported an incomplete ARP entry for `10.10.40.1`.
-- Bidirectional transit connectivity failed.
+- MASON-R1 (`10.10.40.2`) could not reach FortiGate port3 (`10.10.40.1`).
+- MASON-R1 reported an incomplete ARP entry for the FortiGate address.
+- Both transit interfaces appeared operational.
 
-The exact root cause has not been established, and restoration of this specific transit connection has not been independently validated.
+### Subsequent Validation — November 2026
 
-The earlier successful Internet tests remain valid historical evidence, but current FortiGate transit connectivity requires revalidation.
+Connectivity between MASON-R1 and the FortiGate transit interface was successfully restored.
 
-Further investigation is documented in [Troubleshooting Case 13](troubleshooting.md).
+Additional testing confirmed:
+
+- MASON-R1 successfully pinged `10.10.40.1`.
+- Mason Windows Server successfully connected to `example.com` on TCP port 443.
+- Troy Windows 11 successfully received an `HTTP/1.1 200 OK` response using `curl.exe -I https://example.com`.
+
+**Status: PASS — Transit connectivity restored and outbound HTTPS communication validated.**
+
+The underlying cause of the original ARP failure was not conclusively determined.
+
+Internet-directed ICMP ping and traceroute tests continued to experience timeouts during later validation. FortiGate service restrictions remain a possible explanation, but the cause has not been conclusively verified through firewall deny logs.
+
+The separate FortiGate VMnet1 management connectivity issue remains unresolved.
+
+Additional investigation is documented in [Troubleshooting Case 13](troubleshooting.md).

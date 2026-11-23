@@ -4,7 +4,7 @@
 
 The Mason–Troy Enterprise Network is a **two-site hybrid enterprise/manufacturing network** integrating physical Cisco routing and switching equipment with virtualized infrastructure in GNS3. It provides segmented business connectivity between Mason (corporate headquarters) and Troy (manufacturing), centralized enterprise services, and controlled Internet access through a FortiGate virtual firewall.
 
-The project demonstrates hands-on network design, systems administration, security, troubleshooting, and Python automation. **Troy's Legacy/OT VLAN 30 is implemented and ACL-isolated; a production Windows XP/industrial endpoint is a design scenario, not a claimed completed deployment.**
+The project demonstrates hands-on network design, systems administration, security, troubleshooting, and Python automation. **A physical Windows XP manufacturing endpoint was deployed and tested on Troy's Legacy/OT VLAN 30, with extended ACLs implemented and validated to restrict unauthorized routed communication.**
 
 **Project evidence:** [Network validation](docs/validation.md) · [Troubleshooting](docs/troubleshooting.md) · [IP/VLAN plan](docs/ip-vlan-plan.md) · [Python monitoring](automation/network-monitoring/README.md)
 
@@ -83,7 +83,7 @@ Mason additionally uses VLAN 40 for firewall transit and VLAN 999 as a native/ma
 - Revalidate DHCP on Troy Legacy/OT VLAN 30 after ACL enforcement.
 - Optional unauthorized-device port-security and BPDU Guard behavior tests, and independent Telnet-rejection validation.
 - Further Wireshark packet analysis, centralized monitoring/logging, and automated configuration backups.
-- Wireless deployment, RF survey, throughput testing, and any legacy Windows XP/industrial endpoint deployment are **future work**, not completed features.
+- Wireless deployment, RF survey, and throughput testing remain **future work**, not completed features. The physical Windows XP Legacy/OT endpoint was tested as part of the completed project.
 
 The [validation document](docs/validation.md) distinguishes completed behavior tests from configuration-only verification and outstanding work. A successful HTTPS test does not by itself establish that every Internet protocol is permitted.
 

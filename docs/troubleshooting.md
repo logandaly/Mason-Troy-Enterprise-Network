@@ -982,11 +982,20 @@ Although separate stale GNS3 connection problems were previously identified else
 
 ### Resolution Status
 
-**Unresolved — further troubleshooting required.**
+**Connectivity restored — original failure mechanism not conclusively determined.**
 
-No permanent corrective action or successful restoration of transit connectivity has been validated for this incident.
+Subsequent testing in November 2026 confirmed that MASON-R1 could successfully communicate with the FortiGate transit interface at `10.10.40.1`.
 
-### Planned Validation
+Additional end-to-end testing confirmed:
+
+- Mason Windows Server successfully established a TCP connection to `example.com` on port 443.
+- Troy Windows 11 successfully received an `HTTP/1.1 200 OK` response using `curl.exe -I https://example.com`.
+
+These results establish that transit connectivity and permitted HTTPS traffic were operational during final validation. They do not establish the original cause of the ARP failure.
+
+Internet-directed ICMP tests continued to experience timeouts during later testing. The cause has not been conclusively verified through firewall deny logs.
+
+### ### Further Investigation (Optional)
 
 Further investigation should proceed incrementally:
 
@@ -1344,6 +1353,65 @@ This validates automated evidence collection, not the health of every monitored 
 **Status: Resolved — Three-device Python network monitoring successfully validated.**
 
 **Supporting documentation:** [Python Network Monitoring](../automation/network-monitoring/README.md)
+
+---
+
+## Troy Windows 11 DHCP Failure Caused by Port Security — November 2026
+
+### Problem
+
+The Troy Windows 11 virtual workstation could not obtain a DHCP lease across the GNS3-to-physical Cisco network bridge.
+
+### Symptoms
+
+- TROY-WIN11-01 received an APIPA address of `169.254.37.145`.
+- DHCP address acquisition failed.
+- The workstation could not communicate normally through the Troy employee VLAN.
+- TROY-SW1 Fa0/3 recorded port-security violations.
+
+### Investigation
+
+The physical USB-to-Ethernet bridge and the virtual Windows 11 workstation presented two separate MAC addresses on the same Cisco access port.
+
+The port-security configuration allowed only one MAC address and used violation mode `restrict`.
+
+The observed MAC addresses were:
+
+- USB-to-Ethernet adapter: `00e0.4c68.4d31`
+- Virtual workstation: `0ca7.964c.0000`
+
+The switch recorded 108 port-security violations during troubleshooting.
+
+### Root Cause
+
+The one-MAC port-security limit was incompatible with the GNS3 bridge arrangement, where both the physical USB adapter and the virtual workstation appeared behind TROY-SW1 Fa0/3.
+
+The second MAC address exceeded the configured limit and triggered port-security restrictions.
+
+### Resolution
+
+The maximum number of permitted MAC addresses on TROY-SW1 Fa0/3 was increased from one to two.
+
+Port security remained enabled, and the `restrict` violation mode was retained.
+
+### Validation
+
+After correcting the port-security limit:
+
+- TROY-WIN11-01 successfully obtained a valid DHCP lease.
+- The workstation regained connectivity to its Troy VLAN 20 gateway.
+- Connectivity to the centralized Kea DHCP server was restored.
+- Subsequent cross-site traceroute and HTTPS tests succeeded.
+
+### Lesson Learned
+
+Port-security limits must account for the number of legitimate MAC addresses that can appear behind a bridged virtualization interface.
+
+An APIPA address indicates DHCP failure but does not necessarily mean the DHCP service or relay configuration is incorrect.
+
+Switch port-security counters can reveal Layer 2 filtering that prevents otherwise valid DHCP traffic from reaching the network.
+
+**Status: Resolved — Troy workstation connectivity restored through a targeted port-security configuration change.**
 
 ---
 
